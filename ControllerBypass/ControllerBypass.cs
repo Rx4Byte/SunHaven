@@ -12,14 +12,10 @@ namespace SunHaven_ControllerDeactivator
         
 
         #region Awake() | Update() | OnGui()   -   BASE UNITY OBJECT METHODES
-        private void Awake()
-        {
-            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
-        }
+        private void Awake() => Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
         #endregion
 
-        // print itemId on hover
-        #region Patch_try to disable controller
+        #region INPUT PATCHES
         [HarmonyPatch(typeof(Input), "GetButton")]
         class Patch_GetButton
         {
