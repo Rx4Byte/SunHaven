@@ -11,7 +11,7 @@ namespace SunHaven_ControllerDeactivator
     {
         
 
-        #region Awake() | Update() | OnGui()   -   BASE UNITY OBJECT METHODES
+        #region Awake() -   BASE UNITY OBJECT METHODES
         private void Awake() => Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
         #endregion
 
