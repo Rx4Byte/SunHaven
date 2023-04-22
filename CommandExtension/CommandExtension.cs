@@ -455,7 +455,7 @@ namespace SunHaven_CommandExtension
                             CommandFunction_PrintToChat($"{"Day".ColorText(Green)} set to {dateValue.ToString().ColorText(Color.white)}!".ColorText(Yellow));
                             break;
                         case 'h':
-                            if (dateValue < 5 || dateValue > 23) // 6-23 
+                            if (dateValue < 6 || dateValue > 23) // 6-23 
                             { CommandFunction_PrintToChat("hour 6-23 are allowed"); return true; }
                             Date.Time = new DateTime(Date.Time.Year, Date.Time.Month, Date.Time.Day, dateValue + 1, Date.Time.Minute, Date.Time.Second, Date.Time.Millisecond);
                             CommandFunction_PrintToChat($"{"Hour".ColorText(Green)} set to {dateValue.ToString().ColorText(Color.white)}!".ColorText(Yellow));
