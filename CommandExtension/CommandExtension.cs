@@ -446,7 +446,7 @@ namespace SunHaven_CommandExtension
                     {
                         case 'd':
                             if (dateValue <= 0 || dateValue > 28)
-                            { CommandFunction_PrintToChat("day 1-28 are allowed"); return true; }
+                            { CommandFunction_PrintToChat($"day {"1-28".ColorText(Color.white)} are allowed".ColorText(Red)); return true; }
                             DateTime newDate = new DateTime(Date.Time.Year, Date.Time.Month, dateValue, Date.Time.Hour, Date.Time.Minute, Date.Time.Second, Date.Time.Millisecond).AddHours(1);
                             DateTime updatedDate = newDate;
                             typeof(DayCycle).GetField("previousDay", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(FindObjectOfType<DayCycle>(), updatedDate.AddDays(-1));
@@ -455,7 +455,7 @@ namespace SunHaven_CommandExtension
                             break;
                         case 'h':
                             if (dateValue < 6 || dateValue > 23) // 6-23 
-                            { CommandFunction_PrintToChat("hour 6-23 are allowed"); return true; }
+                            { CommandFunction_PrintToChat($"hour {"6-23".ColorText(Color.white)} are allowed".ColorText(Red)); return true; }
                             Date.Time = new DateTime(Date.Time.Year, Date.Time.Month, Date.Time.Day, dateValue + 1, Date.Time.Minute, Date.Time.Second, Date.Time.Millisecond);
                             CommandFunction_PrintToChat($"{"Hour".ColorText(Green)} set to {dateValue.ToString().ColorText(Color.white)}!".ColorText(Yellow));
                             break;
