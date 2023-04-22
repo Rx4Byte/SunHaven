@@ -13,7 +13,7 @@ using Wish;
 namespace SunHaven_CommandExtension
 {
 
-    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.0.5")]
+    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.0.6")]
     public partial class SunHaven_CommandExtension : BaseUnityPlugin
     {
         #region VAR's
@@ -73,12 +73,12 @@ namespace SunHaven_CommandExtension
             new Command(CmdHelp,                "print commands to chat",                                                   CommandState.None),
             new Command(CmdMineReset,           "refill all mine shafts!",                                                  CommandState.None),
             new Command(CmdPause,               "toggle time pause!",                                                       CommandState.Deactivated),
-            new Command(CmdCustomDaySpeed,      "toggle or change dayspeed, ignored if paused!",                            CommandState.Deactivated),
+            new Command(CmdCustomDaySpeed,      "toggle/change dayspeed, ignored if paused!",                               CommandState.Deactivated),
             new Command(CmdMoney,               "give money",                                                               CommandState.None),
-            new Command(CmdSetDate,             "set HOURE '6-23' e.g. 'set h 12'\nset DAY '1-28' e.g. 'set d 12'",         CommandState.None),
+            new Command(CmdSetDate,             "'set h 12' 'set d 12'",                                                    CommandState.None),
             new Command(CmdWeather,             "set DAY '1-28' e.g. 'set d 12'",                                           CommandState.None),
             new Command(CmdDevKit,              "get dev items",                                                            CommandState.None),
-            new Command(CmdJumper,              "jump over object's (actually noclip while jump)",                          CommandState.Deactivated),
+            new Command(CmdJumper,              "jump over object's",                                                       CommandState.Deactivated),
             new Command(CmdState,               "print activ commands",                                                     CommandState.None),
             new Command(CmdPrintItemIds,        "print item ids [xp|money|all|bonus]",                                      CommandState.None),
             new Command(CmdSleep,               "sleep to next the day",                                                    CommandState.None),
@@ -91,8 +91,8 @@ namespace SunHaven_CommandExtension
             new Command(CmdMineClear,           "clear mine completely from rocks & ores",                                  CommandState.None),
             new Command(CmdNoClip,              "walk trough everything",                                                   CommandState.Deactivated),
             new Command(CmdPrintHoverItem,      "print item id to chat",                                                    CommandState.Deactivated),
-            new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
-            new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
+            new Command(CmdName,                "command target '!name Lynn' '!name resets'",                               CommandState.None),
+            new Command(CmdFeedbackDisabled,    "toggle command feedback",                                           CommandState.Deactivated),
             new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None)
         };
         #endregion

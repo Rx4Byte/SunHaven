@@ -9,11 +9,7 @@ namespace SunHaven_ControllerDeactivator
     [BepInPlugin("Rx4Byte.ControllerDeactivator", "Controller Deactivator", "0.1")]
     public partial class SunHaven_ControllerDeactivator : BaseUnityPlugin
     {
-        
-
-        #region Awake() -   BASE UNITY OBJECT METHODES
         private void Awake() => Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
-        #endregion
 
         #region INPUT PATCHES
         [HarmonyPatch(typeof(Input), "GetButton")]
