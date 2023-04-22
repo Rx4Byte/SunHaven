@@ -514,7 +514,7 @@ namespace SunHaven_CommandExtension
                     {
                         foreach (KeyValuePair<string, int> id in allIds)
                         {
-                            if (id.Key.Contains(mayCommandParam[1]))
+                            if (id.Key.Contains(mayCommandParam[1].ToLower()))
                             {
                                 lastItemId = id.Value;
                                 itemsFound++;
