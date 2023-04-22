@@ -13,7 +13,7 @@ using Wish;
 namespace SunHaven_CommandExtension
 {
 
-    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.0.5")]
+    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.1")]
     public partial class SunHaven_CommandExtension : BaseUnityPlugin
     {
         #region VAR's
