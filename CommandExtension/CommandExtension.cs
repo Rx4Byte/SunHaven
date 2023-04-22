@@ -113,7 +113,6 @@ namespace SunHaven_CommandExtension
         private static string playerNameForCommands;
         private static string gap = "  -  ";
         private static int ranOnceOnPlayerSpawn = 0;
-        //private static bool ranOnceAfterSpawn = false;
         private static Color Red = new Color(255, 0, 0);
         private static Color Green = new Color(0, 255, 0);
         private static Color Yellow = new Color(240, 240, 0);
