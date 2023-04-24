@@ -33,6 +33,9 @@ namespace SunHaven_CommandExtension
         public const string CmdPause = CmdPrefix + "pause";
         public const string CmdCustomDaySpeed = CmdPrefix + "timespeed";
         public const string CmdMoney = CmdPrefix + "money";
+        public const string CmdCoins = CmdPrefix + "coins";
+        public const string CmdOrbs = CmdPrefix + "orbs";
+        public const string CmdTickets = CmdPrefix + "tickets";
         public const string CmdSetDate = CmdPrefix + "time";
         public const string CmdWeather = CmdPrefix + "weather";
         public const string CmdDevKit = CmdPrefix + "devkit";
@@ -74,7 +77,9 @@ namespace SunHaven_CommandExtension
             new Command(CmdMineReset,           "refill all mine shafts!",                                                  CommandState.None),
             new Command(CmdPause,               "toggle time pause!",                                                       CommandState.Deactivated),
             new Command(CmdCustomDaySpeed,      "toggle or change dayspeed, ignored if paused!",                            CommandState.Deactivated),
-            new Command(CmdMoney,               "give money",                                                               CommandState.None),
+            new Command(CmdMoney,               "give or remove coins",                                                     CommandState.None),
+            new Command(CmdOrbs,                "give or remove Orbs",                                                      CommandState.None),
+            new Command(CmdTickets,             "give or remove Tickets",                                                   CommandState.None),
             new Command(CmdSetDate,             "set HOURE '6-23' e.g. 'set h 12'\nset DAY '1-28' e.g. 'set d 12'",         CommandState.None),
             new Command(CmdWeather,             "set DAY '1-28' e.g. 'set d 12'",                                           CommandState.None),
             new Command(CmdDevKit,              "get dev items",                                                            CommandState.None),
@@ -190,10 +195,19 @@ namespace SunHaven_CommandExtension
         
                 case CmdCustomDaySpeed:
                     return CommandFunction_CustomDaySpeed(mayCommand);
-        
+
                 case CmdMoney:
                     return CommandFunction_AddMoney(mayCommand);
-        
+
+                case CmdCoins:
+                    return CommandFunction_AddMoney(mayCommand);
+
+                case CmdOrbs:
+                    return CommandFunction_AddOrbs(mayCommand);
+
+                case CmdTickets:
+                    return CommandFunction_AddTickets(mayCommand);
+
                 case CmdSetDate:
                     return CommandFunction_ChangeDate(mayCommand);
         
@@ -402,7 +416,7 @@ namespace SunHaven_CommandExtension
             if (!int.TryParse(Regex.Match(mayCommand, @"\d+").Value, out int moneyAmount))
             {
                 CommandFunction_PrintToChat("Something wen't wrong..".ColorText(Red));
-                CommandFunction_PrintToChat("Try '!money 500'".ColorText(Red));
+                CommandFunction_PrintToChat("Try '!money 500' or '!coins 500'".ColorText(Red));
                 return true;
             }
             if (mayCommand.Contains("-"))
@@ -414,6 +428,48 @@ namespace SunHaven_CommandExtension
             {
                 GetPlayerForCommand().AddMoney(moneyAmount, true, true, true);
                 CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} got {moneyAmount.ToString().ColorText(Color.white)} Coins!".ColorText(Yellow));
+            }
+            return true;
+        }
+        // ADD MONEY
+        private static bool CommandFunction_AddOrbs(string mayCommand)
+        {
+            if (!int.TryParse(Regex.Match(mayCommand, @"\d+").Value, out int moneyAmount))
+            {
+                CommandFunction_PrintToChat("Something wen't wrong..".ColorText(Red));
+                CommandFunction_PrintToChat("Try '!orbs 500'".ColorText(Red));
+                return true;
+            }
+            if (mayCommand.Contains("-"))
+            {
+                GetPlayerForCommand().AddOrbs(-moneyAmount);
+                CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} paid {moneyAmount.ToString().ColorText(Color.white)} Orbs!".ColorText(Yellow));
+            }
+            else
+            {
+                GetPlayerForCommand().AddOrbs(moneyAmount);
+                CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} got {moneyAmount.ToString().ColorText(Color.white)} Orbs!".ColorText(Yellow));
+            }
+            return true;
+        }
+        // ADD MONEY
+        private static bool CommandFunction_AddTickets(string mayCommand)
+        {
+            if (!int.TryParse(Regex.Match(mayCommand, @"\d+").Value, out int moneyAmount))
+            {
+                CommandFunction_PrintToChat("Something wen't wrong..".ColorText(Red));
+                CommandFunction_PrintToChat("Try '!tickets 500'".ColorText(Red));
+                return true;
+            }
+            if (mayCommand.Contains("-"))
+            {
+                GetPlayerForCommand().AddTickets(-moneyAmount);
+                CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} paid {moneyAmount.ToString().ColorText(Color.white)} Tickets!".ColorText(Yellow));
+            }
+            else
+            {
+                GetPlayerForCommand().AddTickets(moneyAmount);
+                CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} got {moneyAmount.ToString().ColorText(Color.white)} Tickets!".ColorText(Yellow));
             }
             return true;
         }
