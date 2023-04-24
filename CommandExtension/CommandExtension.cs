@@ -172,6 +172,8 @@ namespace SunHaven_CommandExtension
         #region CheckIfCommand SendChatMessage
         public static bool CheckIfCommandSendChatMessage(string mayCommand)
         {
+            mayCommand = mayCommand.ToLower();
+            CommandFunction_PrintToChat(mayCommand);
             if (mayCommand[0] != '!' || GetPlayerForCommand() == null && !mayCommand.Contains(CmdName))
                 return false;
         
