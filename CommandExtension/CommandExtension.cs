@@ -13,7 +13,7 @@ using Wish;
 namespace SunHaven_CommandExtension
 {
 
-    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.1")]
+    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.1.2")]
     public partial class SunHaven_CommandExtension : BaseUnityPlugin
     {
         #region VAR's
@@ -410,7 +410,7 @@ namespace SunHaven_CommandExtension
                 CommandFunction_PrintToChat(("Must be inside a Mine!").ColorText(Red));
             return true;
         }
-        // ADD MONEY
+        // ADD MONEY/COINS
         private static bool CommandFunction_AddMoney(string mayCommand)
         {
             if (!int.TryParse(Regex.Match(mayCommand, @"\d+").Value, out int moneyAmount))
