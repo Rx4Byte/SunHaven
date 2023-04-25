@@ -103,7 +103,7 @@ namespace SunHaven_CommandExtension
         #endregion
         // ITEM ID's
         private static Dictionary<string, int> allIds = ItemDatabase.ids;
-        private static Dictionary<string, int> moneyIds = new Dictionary<string, int> { { "coins", 60000 }, { "orbs", 60001 }, { "tickets", 60002 } };
+        private static Dictionary<string, int> moneyIds = new Dictionary<string, int> { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
         private static Dictionary<string, int> xpIds = new Dictionary<string, int> { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
         private static Dictionary<string, int> bonusIds = new Dictionary<string, int> { { "health", 60009 }, { "mana", 60007 } };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
@@ -157,6 +157,7 @@ namespace SunHaven_CommandExtension
         #region CheckIfCommand DisplayChatBubble
         private static bool CheckIfCommandDisplayChatBubble(string mayCommand)
         {
+            mayCommand = mayCommand.ToLower();
             if (mayCommand[0] != '!' || GetPlayerForCommand() == null && !mayCommand.Contains(CmdName))
                 return false;
             foreach (var command in Commands)
@@ -173,7 +174,6 @@ namespace SunHaven_CommandExtension
         public static bool CheckIfCommandSendChatMessage(string mayCommand)
         {
             mayCommand = mayCommand.ToLower();
-            CommandFunction_PrintToChat(mayCommand);
             if (mayCommand[0] != '!' || GetPlayerForCommand() == null && !mayCommand.Contains(CmdName))
                 return false;
         
@@ -576,6 +576,12 @@ namespace SunHaven_CommandExtension
                             {
                                 lastItemId = id.Value;
                                 itemsFound++;
+                                if (mayCommandParam[1] == id.Key)
+                                {
+                                    int itemAmount = ((mayCommandParam.Length >= 3 && int.TryParse(mayCommandParam[2], out itemAmount)) ? itemAmount : 1);
+                                    GetPlayerForCommand().Inventory.AddItem(lastItemId, itemAmount, 0, true, true);
+                                    return true;
+                                }
                             }
                         }
                         if (itemsFound == 1)
