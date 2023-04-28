@@ -3,11 +3,18 @@ using HarmonyLib;
 using System.Reflection;
 using UnityEngine;
 
-namespace SunHaven_ControllerDeactivator
+namespace ControllerBypass
 {
+    public class PluginInfo
+    {
+        public const string PLUGIN_AUTHOR = "Rx4Byte";
+        public const string PLUGIN_NAME = "Controller Deactivator";
+        public const string PLUGIN_GUID = "com.Rx4Byte.ControllerDeactivator";
+        public const string PLUGIN_VERSION = "1.0.0";
+    }
 
-    [BepInPlugin("Rx4Byte.ControllerDeactivator", "Controller Deactivator", "1.0")]
-    public partial class SunHaven_ControllerDeactivator : BaseUnityPlugin
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    public partial class ControllerBypass : BaseUnityPlugin
     {
         private void Awake() => Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
 

@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/MuseumsHelper/Debug.cs
+/MuseumsHelper/DebugProject.csproj
+/MuseumsHelper/OldTests.cs
+/Testing/OldTests.cs
+/Testing/Testing.csproj
+/Testing/Properties/AssemblyInfo.cs
+/MuseumsHelper/Properties/AssemblyInfo.cs

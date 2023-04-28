@@ -10,16 +10,23 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Wish;
 
-namespace SunHaven_CommandExtension
+namespace CommandExtension
 {
+    public class PluginInfo
+    {
+        public const string PLUGIN_AUTHOR = "Rx4Byte";
+        public const string PLUGIN_NAME = "Command Extension";
+        public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
+        public const string PLUGIN_VERSION = "1.1.4";
+    }
 
-    [BepInPlugin("Rx4Byte.CommandExtension", "Command Extension", "1.1.2")]
-    public partial class SunHaven_CommandExtension : BaseUnityPlugin
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    public partial class CommandExtension : BaseUnityPlugin
     {
         #region VAR's
         // debug var's
-        public const bool debugLog = false;
-        public const bool debug = false;
+        public const bool debug = true;
+        public const bool debugLog = debug;
         #region COMMAND's
         // DEAFULT COMMAND PARAMS
         public static class CommandParamDefaults
@@ -55,6 +62,7 @@ namespace SunHaven_CommandExtension
         public const string CmdName = CmdPrefix + "name";
         public const string CmdFeedbackDisabled = CmdPrefix + "feedback";
         public const string CmdGive = CmdPrefix + "give";
+        public const string CmdAutoFillMuseum = CmdPrefix + "autofillmuseum";
         // COMMAND-STATE-ENUM
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
@@ -98,7 +106,8 @@ namespace SunHaven_CommandExtension
             new Command(CmdPrintHoverItem,      "print item id to chat",                                                    CommandState.Deactivated),
             new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
             new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
-            new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None)
+            new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
+            new Command(CmdAutoFillMuseum,      "Toggle museum's auto fill upon entry",                                     CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -135,6 +144,7 @@ namespace SunHaven_CommandExtension
         }
         private void OnGUI()
         {
+
         }
         #endregion
 
@@ -152,7 +162,7 @@ namespace SunHaven_CommandExtension
             return null;
         }
         #endregion
-        
+
         // no chat bubble for commands
         #region CheckIfCommand DisplayChatBubble
         private static bool CheckIfCommandDisplayChatBubble(string mayCommand)
@@ -168,7 +178,7 @@ namespace SunHaven_CommandExtension
             return false;
         }
         #endregion
-        
+
         // check and execute methode
         #region CheckIfCommand SendChatMessage
         public static bool CheckIfCommandSendChatMessage(string mayCommand)
@@ -176,25 +186,25 @@ namespace SunHaven_CommandExtension
             mayCommand = mayCommand.ToLower();
             if (mayCommand[0] != '!' || GetPlayerForCommand() == null && !mayCommand.Contains(CmdName))
                 return false;
-        
+
             string[] mayCommandParam = mayCommand.Split(' ');
             switch (mayCommandParam[0])
             {
                 case CmdHelp:
                     return CommandFunction_Help();
-        
+
                 case CmdState:
                     return CommandFunction_Help(true);
-        
+
                 case CmdFeedbackDisabled:
                     return CommandFunction_ToggleFeedback();
-        
+
                 case CmdMineReset:
                     return CommandFunction_ResetMines();
-        
+
                 case CmdPause:
                     return CommandFunction_Pause();
-        
+
                 case CmdCustomDaySpeed:
                     return CommandFunction_CustomDaySpeed(mayCommand);
 
@@ -212,55 +222,58 @@ namespace SunHaven_CommandExtension
 
                 case CmdSetDate:
                     return CommandFunction_ChangeDate(mayCommand);
-        
+
                 case CmdWeather:
                     return CommandFunction_ChangeWeather(mayCommand);
-        
+
                 case CmdDevKit:
                     return CommandFunction_GiveDevItems();
-        
+
                 case CmdJumper:
                     return CommandFunction_Jumper();
-        
+
                 case CmdSleep:
                     return CommandFunction_Sleep();
-        
+
                 case CmdDasher:
                     return CommandFunction_InfiniteAirSkips();
-        
+
                 case CmdManaFill:
                     return CommandFunction_ManaFill();
-        
+
                 case CmdManaInf:
                     return CommandFunction_InfiniteMana();
-        
+
                 case CmdHealthFill:
                     return CommandFunction_HealthFill();
-        
+
                 case CmdNoHit:
                     return CommandFunction_NoHit();
-        
+
                 case CmdMineOverfill:
                     return CommandFunction_OverfillMines();
-        
+
                 case CmdMineClear:
                     return CommandFunction_ClearMines();
-        
+
                 case CmdNoClip:
                     return CommandFunction_NoClip();
-        
+
                 case CmdPrintHoverItem:
                     return CommandFunction_PrintItemIdOnHover();
-        
+
                 case CmdName:
                     return CommandFunction_SetName(mayCommand);
-        
+
                 case CmdGive:
                     return CommandFunction_GiveItemByIdOrName(mayCommandParam);
-        
+
                 case CmdPrintItemIds:
                     return CommandFunction_PrintItemIds(mayCommandParam);
-        
+
+                case CmdAutoFillMuseum:
+                    return CommandFunction_AutoFillMuseum();
+
                 // no valid command found, execute debug methodes?
                 default:
                     if (debug) //CommandFunction_PrintSpecialItems
@@ -275,7 +288,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // command methodes
         #region CommandFunction - Methode's
         // DEBUG *** (testing only)
@@ -285,7 +298,7 @@ namespace SunHaven_CommandExtension
             if (__boolean)
             {
                 // function
-        
+
                 // command feedback
                 CommandFunction_PrintToChat("first".ColorText(Color.magenta) + " debug methode executed".ColorText(Green));
             }
@@ -293,19 +306,19 @@ namespace SunHaven_CommandExtension
             else
             {
                 // function
-                
+
                 // command feedback
                 CommandFunction_PrintToChat("second".ColorText(Color.magenta) + " debug methode executed".ColorText(Green));
             }
             #region debug/testing only - always commented out this section
             #region toggle player texture (hide player from screen)
-          //playerClient.HideGraphics(); // OR //playerClient.SetGraphicsActive(flag);
+            //playerClient.HideGraphics(); // OR //playerClient.SetGraphicsActive(flag);
             #endregion
             #region player pathing
-          //Player player = GetPlayerForCommand();
-          //Vector2 v2 = player.Position;
-          //v2.y -= 10f;
-          //player.SetTarget(v2, 0.5f);
+            //Player player = GetPlayerForCommand();
+            //Vector2 v2 = player.Position;
+            //v2.y -= 10f;
+            //player.SetTarget(v2, 0.5f);
             #endregion
             #endregion
         }
@@ -479,7 +492,7 @@ namespace SunHaven_CommandExtension
         private static bool CommandFunction_SetName(string mayCommand)
         {
             string[] mayCommandParam = mayCommand.Split(' ');
-            if (mayCommand.Length <= CmdName.Length+1)
+            if (mayCommand.Length <= CmdName.Length + 1)
             {
                 playerNameForCommands = playerNameForCommandsFirst;
                 CommandFunction_PrintToChat($"Command target name {"reseted".ColorText(Green)} to {playerNameForCommandsFirst.ColorText(Color.magenta)}!".ColorText(Yellow));
@@ -746,10 +759,65 @@ namespace SunHaven_CommandExtension
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
+        // AUTO-FILL MUSEUM
+        private static bool CommandFunction_AutoFillMuseum()
+        {
+            int i = Array.FindIndex(Commands, command => command.Name == CmdAutoFillMuseum);
+            Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
+            bool flag = Commands[i].State == CommandState.Activated;
+            CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
+            return true;
+        }
         #endregion
         #endregion
-        
+
         #region Patches
+        // auto fill museum
+        #region Patch_HungryMonster.SetMeta
+        [HarmonyPatch(typeof(HungryMonster))]
+        [HarmonyPatch("SetMeta")]
+        class Patch_HungryMonsterSetMeta
+        {
+            static void Postfix(HungryMonster __instance, DecorationPositionData decorationData)
+            {
+                if (!Commands.Any(command => command.Name == CmdAutoFillMuseum && command.State == CommandState.Activated))
+                    return;
+                if (__instance.bundleType == BundleType.MuseumBundle) // || __instance.bundleType == BundleType.DynusAltar
+                {
+                    Player player = GetPlayerForCommand();
+                    if (player == null)
+                        return;
+                    HungryMonster monster = __instance;
+                    if (monster.sellingInventory != null) // && monster.sellingInventory.Items != null && monster.sellingInventory.Items.Count >= 1
+                    {
+                        foreach (SlotItemData slotItemData in monster.sellingInventory.Items)
+                        {
+                            if (!monster.name.Contains("money") && slotItemData.item != null && player.Inventory != null)
+                            {
+                                if (slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
+                                    continue;
+                                Inventory pInventory = player.Inventory;
+                                foreach (var pItem in pInventory.Items)
+                                {
+                                    if (pItem.id == slotItemData.slot.itemToAccept.id)
+                                    {
+                                        int amount = Math.Min(pItem.amount, slotItemData.slot.numberOfItemToAccept - slotItemData.amount);
+                                        monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), amount, slotItemData.slotNumber, false);
+                                        CommandFunction_PrintToChat($"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}");
+                                        //string x = $"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}";
+                                        player.Inventory.RemoveItem(pItem.item, amount);
+                                        monster.UpdateFullness();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Array.ForEach(FindObjectsOfType<MuseumBundleVisual>(), vPodium => typeof(MuseumBundleVisual).GetMethod("OnSaveInventory", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(vPodium, null));
+                }
+            }
+        }
+        #endregion
+
         // get name for singleplayer
         #region Patch_GameSave.LoadCharacter
         [HarmonyPatch(typeof(GameSave), nameof(GameSave.LoadCharacter))]
@@ -758,7 +826,7 @@ namespace SunHaven_CommandExtension
             static void Postfix(int characterNumber, GameSave __instance) => playerNameForCommands = playerNameForCommandsFirst = __instance.CurrentSave.characterData.characterName;
         }
         #endregion
-        
+
         // infinite airSkips
         #region Patch_Player.AirSkipsUsed
         [HarmonyPatch(typeof(Player), nameof(Player.AirSkipsUsed), MethodType.Setter)]
@@ -770,7 +838,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // skip chat bubble for commands
         #region Patch_Player.DisplayChatBubble
         [HarmonyPatch(typeof(Player), nameof(Player.DisplayChatBubble))]
@@ -784,7 +852,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // get chat message for command check
         #region Patch_Player.SendChatMessage
         [HarmonyPatch(typeof(Player), nameof(Player.SendChatMessage), new[] { typeof(string), typeof(string) })]
@@ -800,7 +868,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // send welcome message and get all items
         #region Patch_Player.Initialize
         [HarmonyPatch(typeof(Player), nameof(Player.Initialize))]
@@ -812,11 +880,21 @@ namespace SunHaven_CommandExtension
                     ranOnceOnPlayerSpawn++;
                 else if (ranOnceOnPlayerSpawn == 2)
                     if (Commands[Array.FindIndex(Commands, command => command.Name == CmdFeedbackDisabled)].State == CommandState.Deactivated)
-                    { CommandFunction_PrintToChat("> Command Extension Active! type '!help' for command list".ColorText(Color.magenta) + "\n -----------------------------------------------------------------".ColorText(Color.black)); ranOnceOnPlayerSpawn++; }
+                    { 
+                        CommandFunction_PrintToChat("> Command Extension Active! type '!help' for command list".ColorText(Color.magenta) + "\n -----------------------------------------------------------------".ColorText(Color.black));
+                        ranOnceOnPlayerSpawn++;
+                        if (debug)
+                        {
+                            CommandFunction_PrintToChat("debug: use helping methodes");
+                            CommandFunction_InfiniteAirSkips();
+                            CommandFunction_InfiniteMana();
+                            CommandFunction_NoClip();
+                        }
+                    }
             }
         }
         #endregion
-        
+
         // jump over everything
         #region Patch_Player.Update
         [HarmonyPatch(typeof(Player), "Update")]
@@ -834,7 +912,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // no mana use
         #region Patch_Player.UseMana
         [HarmonyPatch(typeof(Player), nameof(Player.UseMana), new[] { typeof(float) })]
@@ -846,7 +924,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // pause and custom time multiplier
         #region Patch_DayCycle.DaySpeedMultiplier
         [HarmonyPatch(typeof(Settings))]
@@ -865,7 +943,7 @@ namespace SunHaven_CommandExtension
             }
         }
         #endregion
-        
+
         // print itemId on hover
         #region Patch_Item.GetToolTip
         [HarmonyPatch]
