@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Security.Policy;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using Wish;
@@ -25,7 +26,7 @@ namespace CommandExtension
     {
         #region VAR's
         // debug var's
-        public const bool debug = true;
+        public const bool debug = false;
         public const bool debugLog = debug;
         #region COMMAND's
         // DEAFULT COMMAND PARAMS
@@ -63,6 +64,7 @@ namespace CommandExtension
         public const string CmdFeedbackDisabled = CmdPrefix + "feedback";
         public const string CmdGive = CmdPrefix + "give";
         public const string CmdAutoFillMuseum = CmdPrefix + "autofillmuseum";
+        public const string CmdCheatFillMuseum = CmdPrefix + "cheatfillmuseum";
         // COMMAND-STATE-ENUM
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
@@ -107,7 +109,8 @@ namespace CommandExtension
             new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
             new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
             new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
-            new Command(CmdAutoFillMuseum,      "Toggle museum's auto fill upon entry",                                     CommandState.Deactivated)
+            new Command(CmdAutoFillMuseum,      "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
+            new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -273,6 +276,9 @@ namespace CommandExtension
 
                 case CmdAutoFillMuseum:
                     return CommandFunction_AutoFillMuseum();
+
+                case CmdCheatFillMuseum:
+                    return CommandFunction_CheatFillMuseum();
 
                 // no valid command found, execute debug methodes?
                 default:
@@ -768,6 +774,16 @@ namespace CommandExtension
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
+
+        // CHEAT-FILL MUSEUM
+        private static bool CommandFunction_CheatFillMuseum()
+        {
+            int i = Array.FindIndex(Commands, command => command.Name == CmdCheatFillMuseum);
+            Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
+            bool flag = Commands[i].State == CommandState.Activated;
+            CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
+            return true;
+        }
         #endregion
         #endregion
 
@@ -780,40 +796,62 @@ namespace CommandExtension
         {
             static void Postfix(HungryMonster __instance, DecorationPositionData decorationData)
             {
-                if (!Commands.Any(command => command.Name == CmdAutoFillMuseum && command.State == CommandState.Activated))
-                    return;
-                if (__instance.bundleType == BundleType.MuseumBundle) // || __instance.bundleType == BundleType.DynusAltar
+                if (__instance.bundleType == BundleType.MuseumBundle)
                 {
-                    Player player = GetPlayerForCommand();
-                    if (player == null)
-                        return;
-                    HungryMonster monster = __instance;
-                    if (monster.sellingInventory != null) // && monster.sellingInventory.Items != null && monster.sellingInventory.Items.Count >= 1
+                    if (Commands[Array.FindIndex(Commands, command => command.Name == CmdCheatFillMuseum)].State == CommandState.Activated
+                    ||
+                    Commands[Array.FindIndex(Commands, command => command.Name == CmdAutoFillMuseum)].State == CommandState.Activated)
                     {
-                        foreach (SlotItemData slotItemData in monster.sellingInventory.Items)
+                        Player player = GetPlayerForCommand();
+                        if (player == null)
+                            return;
+                        HungryMonster monster = __instance;
+                        if (monster.sellingInventory != null) // && monster.sellingInventory.Items != null && monster.sellingInventory.Items.Count >= 1
                         {
-                            if (!monster.name.Contains("money") && slotItemData.item != null && player.Inventory != null)
+                            if (Commands.Any(command => command.Name == CmdCheatFillMuseum && command.State == CommandState.Activated))
                             {
-                                if (slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
-                                    continue;
-                                Inventory pInventory = player.Inventory;
-                                foreach (var pItem in pInventory.Items)
+                                foreach (SlotItemData slotItemData in monster.sellingInventory.Items)
                                 {
-                                    if (pItem.id == slotItemData.slot.itemToAccept.id)
+                                    if (!monster.name.ToLower().Contains("money") && slotItemData.item != null)
                                     {
-                                        int amount = Math.Min(pItem.amount, slotItemData.slot.numberOfItemToAccept - slotItemData.amount);
-                                        monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), amount, slotItemData.slotNumber, false);
-                                        CommandFunction_PrintToChat($"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}");
-                                        //string x = $"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}";
-                                        player.Inventory.RemoveItem(pItem.item, amount);
+                                        if (slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
+                                            continue;
+                                        monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false);
                                         monster.UpdateFullness();
                                     }
                                 }
                             }
+                            else
+                            {
+                                foreach (SlotItemData slotItemData in monster.sellingInventory.Items)
+                                {
+                                    if (!monster.name.ToLower().Contains("money") && slotItemData.item != null && player.Inventory != null)
+                                    {
+                                        if (slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
+                                            continue;
+                                        Inventory pInventory = player.Inventory;
+                                        foreach (var pItem in pInventory.Items)
+                                        {
+                                            if (pItem.id == slotItemData.slot.itemToAccept.id)
+                                            {
+                                                int amount = Math.Min(pItem.amount, slotItemData.slot.numberOfItemToAccept - slotItemData.amount);
+                                                monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), amount, slotItemData.slotNumber, false);
+                                                CommandFunction_PrintToChat($"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}");
+                                                player.Inventory.RemoveItem(pItem.item, amount);
+                                                monster.UpdateFullness();
+                                            }
+                                        }
+
+                                    }
+                                }
+                            }
+
                         }
+                        Array.ForEach(FindObjectsOfType<MuseumBundleVisual>(), vPodium => typeof(MuseumBundleVisual).GetMethod("OnSaveInventory", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(vPodium, null));
                     }
-                    Array.ForEach(FindObjectsOfType<MuseumBundleVisual>(), vPodium => typeof(MuseumBundleVisual).GetMethod("OnSaveInventory", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(vPodium, null));
                 }
+                
+                
             }
         }
         #endregion
