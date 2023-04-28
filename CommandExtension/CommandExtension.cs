@@ -812,12 +812,21 @@ namespace CommandExtension
                             {
                                 foreach (SlotItemData slotItemData in monster.sellingInventory.Items)
                                 {
-                                    if (!monster.name.ToLower().Contains("money") && slotItemData.item != null)
-                                    {
-                                        if (slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
-                                            continue;
+                                    if (slotItemData.item == null || slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
+                                        continue;
+                                    if (!monster.name.ToLower().Contains("money"))
+                                    {   
                                         monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false);
                                         monster.UpdateFullness();
+                                    }
+                                    else if (monster.name.ToLower().Contains("money"))
+                                    {
+                                        if (slotItemData.slot.itemToAccept.id == 60000)
+                                            monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
+                                        else if (slotItemData.slot.itemToAccept.id == 60001)
+                                            monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
+                                        else if (slotItemData.slot.itemToAccept.id == 60002)
+                                            monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
                                     }
                                 }
                             }
