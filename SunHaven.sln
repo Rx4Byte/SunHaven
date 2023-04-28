@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ControllerBypass", "Control
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Testing", "Testing\Testing.csproj", "{302487BE-82A1-4CEA-869E-634D70630FD7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFillMuseum", "AutoFillMuseum\AutoFillMuseum.csproj", "{42FB4437-21F9-42F4-91DB-CE0F908CEAA8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{302487BE-82A1-4CEA-869E-634D70630FD7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{302487BE-82A1-4CEA-869E-634D70630FD7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{302487BE-82A1-4CEA-869E-634D70630FD7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42FB4437-21F9-42F4-91DB-CE0F908CEAA8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42FB4437-21F9-42F4-91DB-CE0F908CEAA8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42FB4437-21F9-42F4-91DB-CE0F908CEAA8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42FB4437-21F9-42F4-91DB-CE0F908CEAA8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
