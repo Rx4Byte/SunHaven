@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Wish;
 
-namespace CommandExtension
+namespace AutoFillMuseum
 {
     public class PluginInfo
     {
