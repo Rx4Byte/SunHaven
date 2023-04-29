@@ -44,7 +44,7 @@ namespace Testing
 
         #region Base
         // get the player for singleplayer/multiplayer
-        public static Player GetPlayerForCommand()
+        public static Player GetPlayer()
         {
             return Player.Instance;
         }
