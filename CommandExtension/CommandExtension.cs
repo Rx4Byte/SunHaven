@@ -63,6 +63,7 @@ namespace CommandExtension
         public const string CmdName = CmdPrefix + "name";
         public const string CmdFeedbackDisabled = CmdPrefix + "feedback";
         public const string CmdGive = CmdPrefix + "give";
+        public const string CmdShowItems = CmdPrefix + "showitems";
         public const string CmdAutoFillMuseum = CmdPrefix + "autofillmuseum";
         public const string CmdCheatFillMuseum = CmdPrefix + "cheatfillmuseum";
         // COMMAND-STATE-ENUM
@@ -109,8 +110,9 @@ namespace CommandExtension
             new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
             new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
             new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
+            new Command(CmdShowItems,            "print items with the given name",                                          CommandState.None),
             new Command(CmdAutoFillMuseum,      "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
-            new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                CommandState.Deactivated)
+            new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -270,6 +272,9 @@ namespace CommandExtension
 
                 case CmdGive:
                     return CommandFunction_GiveItemByIdOrName(mayCommandParam);
+
+                case CmdShowItems:
+                    return CommandFunction_ShowItemByName(mayCommandParam);
 
                 case CmdPrintItemIds:
                     return CommandFunction_PrintItemIds(mayCommandParam);
@@ -567,7 +572,7 @@ namespace CommandExtension
             }
             return true;
         }
-        // GIVE ITEM BY ID 
+        // GIVE ITEM BY ID/NAME 
         private static bool CommandFunction_GiveItemByIdOrName(string[] mayCommandParam)
         {
             if (mayCommandParam.Length >= 2)
@@ -627,6 +632,26 @@ namespace CommandExtension
             }
             else
                 CommandFunction_PrintToChat($"wrong use of !give".ColorText(Red));
+            return true;
+        }
+        // GIVE ITEM BY ID/NAME 
+        private static bool CommandFunction_ShowItemByName(string[] mayCommandParam)
+        {
+            if (mayCommandParam.Length >= 2)
+            {
+                List<string> items = new List<string>();
+                foreach (KeyValuePair<string, int> id in allIds)
+                {
+                    if (id.Key.ToLower().Contains(mayCommandParam[1]))
+                        items.Add(id.Key.ColorText(Color.white) + " : ".ColorText(Color.black) + id.Value.ToString().ColorText(Color.white));
+                }
+                if (items.Count >= 1)
+                {
+                    CommandFunction_PrintToChat("[FOUND ITEMS]".ColorText(Color.black));
+                    foreach (string ítem in items)
+                        CommandFunction_PrintToChat(ítem);
+                }
+            }
             return true;
         }
         // GIVE DEV ITEMS
@@ -774,7 +799,6 @@ namespace CommandExtension
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
-
         // CHEAT-FILL MUSEUM
         private static bool CommandFunction_CheatFillMuseum()
         {
