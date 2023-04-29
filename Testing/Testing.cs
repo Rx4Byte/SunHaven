@@ -50,42 +50,18 @@ namespace Testing
         }
         // PRINT FUNCTION
         private static void LogChat(string text) => QuantumConsole.Instance.LogPlayerText(text);
-        // no chat bubble for test methode
-        private static bool IsTestCommandBubble(string mayCommand)
-        {
-            if (!debug)
-                return false;
-            mayCommand = mayCommand.ToLower();
-            switch (mayCommand)
-            {
-                case "test1":
-                    return true;
-
-                case "test2":
-                    return true;
-
-                case "test3":
-                    return true;
-
-                case "test4":
-                    return true;
-
-                default:
-                    return false;
-            }
-        }
         // check and execute methode
-        public static bool IsTestCommand(string mayCmd, bool exit)
+        public static bool IsTestCommand(string mayCmd, bool exit = false)
         {
             if (!debug)
                 return false;
+            mayCmd = mayCmd.ToLower();
             if (exit)
                 foreach (string cmd in new string[] {"test1", "test2", "test3", "test4"})
                     if (mayCmd == cmd)
                         return true;
                     else
                         return false;
-            mayCmd = mayCmd.ToLower();
             switch (mayCmd)
             {
                 case "test1":
@@ -122,7 +98,7 @@ namespace Testing
         {
             static bool Prefix(ref string text)
             {
-                if (IsTestCommandBubble(text))
+                if (IsTestCommand(text, true))
                     return false;
                 return true;
             }
