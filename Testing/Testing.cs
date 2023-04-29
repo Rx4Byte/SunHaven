@@ -75,12 +75,18 @@ namespace Testing
             }
         }
         // check and execute methode
-        public static bool IsTestCommandChat(string mayCommand)
+        public static bool IsTestCommand(string mayCmd, bool exit)
         {
             if (!debug)
                 return false;
-            mayCommand = mayCommand.ToLower();
-            switch (mayCommand)
+            if (exit)
+                foreach (string cmd in new string[] {"test1", "test2", "test3", "test4"})
+                    if (mayCmd == cmd)
+                        return true;
+                    else
+                        return false;
+            mayCmd = mayCmd.ToLower();
+            switch (mayCmd)
             {
                 case "test1":
                     LogChat("[TEST-1]".ColorText(Color.black) + " start".ColorText(Color.white));
@@ -127,7 +133,7 @@ namespace Testing
         {
             static bool Prefix(string characterName, string message)
             {
-                if (IsTestCommandChat(message))
+                if (IsTestCommand(message))
                     return false;  // SEND COMMAND 
                 return true;  // SEND CHAT
             }
