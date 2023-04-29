@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using Wish;
 
-namespace AutoFillMuseum
+namespace CommandExtension
 {
     public class PluginInfo
     {
