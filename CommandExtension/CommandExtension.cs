@@ -126,12 +126,6 @@ namespace CommandExtension
         private static bool printOnHover = false;
         private static bool infMana = false;
         private static bool infAirSkips = false;
-
-        private static bool test2 = false;
-
-
-        private static bool test = false;
-
         // ...
         private static float timeMultiplier = CommandParamDefaults.timeMultiplier;
         private static string playerNameForCommandsFirst;
