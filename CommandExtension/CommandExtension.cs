@@ -63,7 +63,7 @@ namespace CommandExtension
         public const string CmdName = CmdPrefix + "name";
         public const string CmdFeedbackDisabled = CmdPrefix + "feedback";
         public const string CmdGive = CmdPrefix + "give";
-        public const string CmdShowItems = CmdPrefix + "showitems";
+        public const string CmdShowItems = CmdPrefix + "items";
         public const string CmdAutoFillMuseum = CmdPrefix + "autofillmuseum";
         public const string CmdCheatFillMuseum = CmdPrefix + "cheatfillmuseum";
         // COMMAND-STATE-ENUM
@@ -110,7 +110,7 @@ namespace CommandExtension
             new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
             new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
             new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
-            new Command(CmdShowItems,            "print items with the given name",                                          CommandState.None),
+            new Command(CmdShowItems,           "print items with the given name",                                          CommandState.None),
             new Command(CmdAutoFillMuseum,      "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
             new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated)
         };
