@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
 using System.Text.RegularExpressions;
 using UnityEngine;
 using Wish;
@@ -67,7 +66,8 @@ namespace CommandExtension
         public const string CmdAutoFillMuseum = CmdPrefix + "autofillmuseum";
         public const string CmdCheatFillMuseum = CmdPrefix + "cheatfillmuseum";
         public const string CmdUI = CmdPrefix + "ui";
-        // COMMAND-STATE-ENUM
+        public const string CmdTeleport = CmdPrefix + "tp";
+        public const string CmdTeleportLocations = CmdPrefix + "tps";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -114,7 +114,9 @@ namespace CommandExtension
             new Command(CmdShowItems,           "print items with the given name",                                          CommandState.None),
             new Command(CmdAutoFillMuseum,      "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
             new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated),
-            new Command(CmdUI,                  "turn ui on/off",                                                           CommandState.None)
+            new Command(CmdUI,                  "turn ui on/off",                                                           CommandState.None),
+            new Command(CmdTeleport,            "teleport to some locations",                                               CommandState.None),
+            new Command(CmdTeleportLocations,   "get teleport locations",                                                   CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -122,6 +124,32 @@ namespace CommandExtension
         private static Dictionary<string, int> moneyIds = new Dictionary<string, int> { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
         private static Dictionary<string, int> xpIds = new Dictionary<string, int> { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
         private static Dictionary<string, int> bonusIds = new Dictionary<string, int> { { "health", 60009 }, { "mana", 60007 } };
+        private static Dictionary<string, string> tpLocations = new Dictionary<string, string>()
+        {
+            { "Throneroom", "throneroom" },
+            { "Nelvari", "nelvari6" },
+            { "Wishing Well", "wishingwell" },
+            { "Dynus Altar", "altar" },
+            { "Hospital", "hospital" },
+            { "Sun Haven", "sunhaven" },
+            { "Sun Haven Farm", "farm" },
+            { "Nelvari Farm", "nelvarifarm" },
+            { "Nelvari Mines", "nelvarimine" },
+            { "Nelvari Home", "nelvarihome" },
+            { "Withergate Farm", "withergatefarm" },
+            { "Withergate Castle", "castle" },
+            { "Withergate Apartment", "withergatehome" },
+            { "Grand Tree", "grandtree"  },
+            { "Wilderness Taxi", "taxi" },
+            { "Dynus", "dynus" },
+            { "Sewer", "sewer" },
+            { "Nivara", "nivara" },
+            { "Barracks", "barracks" },
+            { "Dragon", "dragon" },
+            { "Combat Dungeon", "dungeon" },
+            { "General Store", "store" },
+            { "Beach", "beach" }
+        };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = false;
         private static bool noclip = false;
@@ -290,16 +318,14 @@ namespace CommandExtension
                 case CmdUI:
                     return CommandFunction_ToggleUI(mayCommand);
 
+                case CmdTeleport:
+                    return CommandFunction_TeleportToScene(mayCommandParam);
+
+                //case CmdTeleportLocations:
+                //    return CommandFunction_PrintTeleportLoactions();
+
                 // no valid command found, execute debug methodes?
                 default:
-                    if (debug) //CommandFunction_PrintSpecialItems
-                    {
-                        if (mayCommand.Contains("debug"))
-                            CommandFunction_Debug(mayCommand, !mayCommand.Contains("next"));
-                        else
-                            CommandFunction_PrintToChat($"'{"!debug".ColorText(Color.white)}' or '{"!debug next".ColorText(Color.white)}'".ColorText(Color.magenta));
-                        return true;
-                    }
                     return false;
             }
         }
@@ -307,37 +333,6 @@ namespace CommandExtension
 
         // command methodes
         #region CommandFunction - Methode's
-        // DEBUG *** (testing only)
-        private static void CommandFunction_Debug(string __string, bool __boolean)
-        {
-            // first debug methode
-            if (__boolean)
-            {
-                // function
-
-                // command feedback
-                CommandFunction_PrintToChat("first".ColorText(Color.magenta) + " debug methode executed".ColorText(Green));
-            }
-            // second debug methode
-            else
-            {
-                // function
-
-                // command feedback
-                CommandFunction_PrintToChat("second".ColorText(Color.magenta) + " debug methode executed".ColorText(Green));
-            }
-            #region debug/testing only - always commented out this section
-            #region toggle player texture (hide player from screen)
-            //playerClient.HideGraphics(); // OR //playerClient.SetGraphicsActive(flag);
-            #endregion
-            #region player pathing
-            //Player player = GetPlayerForCommand();
-            //Vector2 v2 = player.Position;
-            //v2.y -= 10f;
-            //player.SetTarget(v2, 0.5f);
-            #endregion
-            #endregion
-        }
         // PRINT FUNCTION **
         private static void CommandFunction_PrintToChat(string text)
         {
@@ -905,6 +900,71 @@ namespace CommandExtension
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
+        // TELEPORT
+        private static bool CommandFunction_TeleportToScene(string[] mayCmdParam)
+        {
+            if (mayCmdParam.Length <= 1)
+                return true;
+            string scene = mayCmdParam[1].ToLower().Replace(" ", "");
+            if (scene == "withergatefarm")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(126.125f, 83.6743f), "WithergateRooftopFarm"); //works
+            else if (scene == "throneroom")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(21.5f, 8.681581f), "Throneroom");  //works - test
+            else if (scene == "nelvari6")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(320.3333f, 98.76098f), "Nelvari6"); //nelvari bottom bridge
+            else if (scene == "wishingwell" || scene.Contains("wishing"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(55.83683f, 42.80461f), "WishingWell"); //works - test
+            else if (scene.Contains("altar"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(199.3957f, 122.6284f), "DynusAltar"); //good
+            else if (scene.Contains("hospital"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(80.83334f, 65.58415f), "Hospital"); //good
+            else if (scene.Contains("sunhaven"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(268.125f, 299.9311f), "Town10"); //good
+            else if (scene.Contains("homefarm") || scene.Contains("sunhavenhome") || scene.Contains("playerfarm") || scene == "farm")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(357f, 124.3919f), "2Playerfarm"); //good
+            else if (scene.Contains("nelvarifarm"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(148.25f, 100.8806f), "NelvariFarm"); //good
+            else if (scene.Contains("nelvarimine")) //new Vector2(154.1667f, 157.2463f)
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(144.7558f, 111.1503f), "NelvariMinesEntrance"); //works - test
+            else if (scene.Contains("nelvarihome"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(51.5f, 54.97755f), "NelvariPlayerHouse"); //good
+            else if (scene.Contains("castle")) //new Vector2(24.25f, 86.09025f)
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(133.6865f, 163.3773f), "Withergatecastleentrance"); //works - test
+            else if (scene.Contains("withergatehome"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(63.5f, 54.624f), "WithergatePlayerApartment"); //good
+            else if (scene.Contains("grandtree"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(314.4297f, 235.2298f), "GrandTreeEntrance1"); //good
+            else if (scene.Contains("taxi"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(101.707f, 123.4622f), "WildernessTaxi"); //works
+            else if (scene == "dynus")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(94.5f, 121.09f), "Dynus"); //good
+            else if (scene == "sewer") // new Vector2(13.70833f, 134.4075f)
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(134.5833f, 129.813f), "Sewer"); //good
+            else if (scene == "nivara")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(99.5f, 194.3229f), "Nivara"); //works - test
+            else if (scene == "barracks")
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(71.58334f, 54.56507f), "Barracks"); //good
+            else if (scene.Contains("dragon"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(114f, 73.7052f), "DragonsMeet"); //works - test
+            else if (scene.Contains("dungeon"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(136.48f, 193.92f), "CombatDungeonEntrance"); //good
+            else if (scene.Contains("store"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(77.5f, 58.55f), "GeneralStore"); //good
+            else if (scene.Contains("beach"))
+                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(96.491529f, 64.69862f), "BeachRevamp");
+            else
+                CommandFunction_PrintToChat("invalid scene name".ColorText(Color.red));
+            return true;
+        }
+
+        //private static bool CommandFunction_PrintTeleportLoactions()
+        //{
+        //    //foreach (string locationName in tpLocations.)
+        //    //{
+        //    //
+        //    //}
+        //    //return true;
+        //}
         #endregion
         #endregion
 
