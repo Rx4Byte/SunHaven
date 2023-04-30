@@ -66,6 +66,7 @@ namespace CommandExtension
         public const string CmdShowItems = CmdPrefix + "items";
         public const string CmdAutoFillMuseum = CmdPrefix + "autofillmuseum";
         public const string CmdCheatFillMuseum = CmdPrefix + "cheatfillmuseum";
+        public const string CmdUI = CmdPrefix + "ui";
         // COMMAND-STATE-ENUM
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
@@ -112,7 +113,8 @@ namespace CommandExtension
             new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
             new Command(CmdShowItems,           "print items with the given name",                                          CommandState.None),
             new Command(CmdAutoFillMuseum,      "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
-            new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated)
+            new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated),
+            new Command(CmdUI,                  "turn ui on/off",                                                           CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -284,6 +286,9 @@ namespace CommandExtension
 
                 case CmdCheatFillMuseum:
                     return CommandFunction_CheatFillMuseum();
+
+                case CmdUI:
+                    return CommandFunction_ToggleUI(mayCommand);
 
                 // no valid command found, execute debug methodes?
                 default:
@@ -758,6 +763,98 @@ namespace CommandExtension
                 Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
             bool flag = Commands[i].State == CommandState.Activated;
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
+            return true;
+        }
+        // UI ON/OFF
+        private static bool CommandFunction_ToggleUI(string mayCommand)
+        {
+            string[] mayCommandParam = mayCommand.Split(' ');
+            string error = $"try '{"!ui [on/off]".ColorText(Color.white)}'".ColorText(Red);
+            if (mayCommandParam.Length >= 2)
+            {
+                bool flag = true;
+                if (mayCommandParam[1].Contains("on"))
+                    flag = true;
+                else if (mayCommandParam[1].Contains("of"))
+                    flag = false;
+                else
+                    CommandFunction_PrintToChat(error);
+                #region gameObject.SetActive (from QuantumConsoleManager commands)
+                GameObject gameObject = Utilities.FindObject(GameObject.Find("Player"), "ActionBar");
+                if (gameObject != null)
+                {
+                    gameObject.SetActive(flag);
+                }
+                GameObject gameObject2 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "ActionBar");
+                if (gameObject2 != null)
+                {
+                    gameObject2.SetActive(flag);
+                }
+                GameObject gameObject3 = Utilities.FindObject(GameObject.Find("Player"), "ExpBars");
+                if (gameObject3 != null)
+                {
+                    gameObject3.SetActive(flag);
+                }
+                GameObject gameObject4 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "ExpBars");
+                if (gameObject4 != null)
+                {
+                    gameObject4.SetActive(flag);
+                }
+                GameObject gameObject5 = Utilities.FindObject(GameObject.Find("Player"), "QuestTracking");
+                if (gameObject5 != null)
+                {
+                    gameObject5.SetActive(flag);
+                }
+                GameObject gameObject6 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "QuestTracking");
+                if (gameObject6 != null)
+                {
+                    gameObject6.SetActive(flag);
+                }
+                GameObject gameObject7 = Utilities.FindObject(GameObject.Find("Player"), "QuestTracker");
+                if (gameObject7 != null)
+                {
+                    gameObject7.SetActive(flag);
+                }
+                GameObject gameObject8 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "QuestTracker");
+                if (gameObject8 != null)
+                {
+                    gameObject8.SetActive(flag);
+                }
+                GameObject gameObject9 = Utilities.FindObject(GameObject.Find("Player"), "HelpNotifications");
+                if (gameObject9 != null)
+                {
+                    gameObject9.SetActive(flag);
+                }
+                GameObject gameObject10 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "HelpNotifications");
+                if (gameObject10 != null)
+                {
+                    gameObject10.SetActive(flag);
+                }
+                GameObject gameObject11 = Utilities.FindObject(GameObject.Find("Player"), "NotificationStack");
+                if (gameObject11 != null)
+                {
+                    gameObject11.SetActive(flag);
+                }
+                GameObject gameObject12 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "NotificationStack");
+                if (gameObject12 != null)
+                {
+                    gameObject12.SetActive(flag);
+                }
+                GameObject gameObject13 = Utilities.FindObject(GameObject.Find("Manager"), "UI");
+                if (gameObject13 != null)
+                {
+                    gameObject13.SetActive(flag);
+                }
+                GameObject gameObject14 = GameObject.Find("QuestTrackerVisibilityToggle");
+                if (gameObject14 != null)
+                {
+                    gameObject14.SetActive(flag);
+                }
+                #endregion
+                CommandFunction_PrintToChat("UI now ".ColorText(Yellow) + (flag ? "VISIBLE".ColorText(Green) : "HIDDEN".ColorText(Green)));
+            }
+            else
+                CommandFunction_PrintToChat(error);
             return true;
         }
         // JUMPER
