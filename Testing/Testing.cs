@@ -50,7 +50,7 @@ namespace Testing
             return Player.Instance;
         }
         // PRINT FUNCTION
-        private static void LogChat(string text) => QuantumConsole.Instance.LogPlayerText(text);
+        private static void PrintToChat(string text) => QuantumConsole.Instance.LogPlayerText(text);
         // check and execute methode
         public static bool TestCommand(string mayCmd, bool exit = false)
         {
@@ -59,7 +59,7 @@ namespace Testing
             string[] mayCmdParam = mayCmd.ToLower().Split(' ');
             if (!(mayCmdParam.Length >= 1))
             {
-                LogChat("no params");
+                PrintToChat("no params");
                 return true;
             }
             if (exit)
@@ -75,23 +75,23 @@ namespace Testing
             switch (mayCmdParam[0])
             {
                 case "test1":
-                    LogChat("[TEST-1]".ColorText(Color.black) + " start".ColorText(Color.white));
-                    LogChat("[TEST-1]".ColorText(Color.black) + (TestMethode1(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
+                    PrintToChat("[TEST-1]".ColorText(Color.black) + " start".ColorText(Color.white));
+                    PrintToChat("[TEST-1]".ColorText(Color.black) + (TestMethode1(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
                     return true;
 
                 case "test2":
-                    LogChat("[TEST-2]".ColorText(Color.black) + " start".ColorText(Color.white));
-                    LogChat("[TEST-2]".ColorText(Color.black) + (TestMethode2(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
+                    PrintToChat("[TEST-2]".ColorText(Color.black) + " start".ColorText(Color.white));
+                    PrintToChat("[TEST-2]".ColorText(Color.black) + (TestMethode2(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
                     return true;
 
                 case "test3":
-                    LogChat("[TEST-3]".ColorText(Color.black) + " start".ColorText(Color.white));
-                    LogChat("[TEST-3]".ColorText(Color.black) + (TestMethode3(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
+                    PrintToChat("[TEST-3]".ColorText(Color.black) + " start".ColorText(Color.white));
+                    PrintToChat("[TEST-3]".ColorText(Color.black) + (TestMethode3(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
                     return true;
 
                 case "test4":
-                    LogChat("[TEST-4]".ColorText(Color.black) + " start".ColorText(Color.white));
-                    LogChat("[TEST-4]".ColorText(Color.black) + (TestMethode4(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
+                    PrintToChat("[TEST-4]".ColorText(Color.black) + " start".ColorText(Color.white));
+                    PrintToChat("[TEST-4]".ColorText(Color.black) + (TestMethode4(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
                     return true;
 
                 default:
@@ -124,106 +124,28 @@ namespace Testing
         #endregion
 
         #region Methode's
-        // TEST 1
+        // hide ui
         private static bool TestMethode1(string[] mayCmdParam)
         {
-            var flag = true;
-            if (mayCmdParam.Length >= 2)
-            {
-                if (mayCmdParam[1].Contains("on") || mayCmdParam[1].StartsWith("ac"))
-                    flag = true;
-                else if (mayCmdParam[1].Contains("of") || mayCmdParam[1].StartsWith("de"))
-                    flag = false;
-                else
-                    return false;
-            }
-            else
-                return false;
-            GameObject gameObject = Utilities.FindObject(GameObject.Find("Player"), "ActionBar");
-            if (gameObject != null)
-            {
-                gameObject.SetActive(flag);
-            }
-            GameObject gameObject2 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "ActionBar");
-            if (gameObject2 != null)
-            {
-                gameObject2.SetActive(flag);
-            }
-            GameObject gameObject3 = Utilities.FindObject(GameObject.Find("Player"), "ExpBars");
-            if (gameObject3 != null)
-            {
-                gameObject3.SetActive(flag);
-            }
-            GameObject gameObject4 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "ExpBars");
-            if (gameObject4 != null)
-            {
-                gameObject4.SetActive(flag);
-            }
-            GameObject gameObject5 = Utilities.FindObject(GameObject.Find("Player"), "QuestTracking");
-            if (gameObject5 != null)
-            {
-                gameObject5.SetActive(flag);
-            }
-            GameObject gameObject6 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "QuestTracking");
-            if (gameObject6 != null)
-            {
-                gameObject6.SetActive(flag);
-            }
-            GameObject gameObject7 = Utilities.FindObject(GameObject.Find("Player"), "QuestTracker");
-            if (gameObject7 != null)
-            {
-                gameObject7.SetActive(flag);
-            }
-            GameObject gameObject8 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "QuestTracker");
-            if (gameObject8 != null)
-            {
-                gameObject8.SetActive(flag);
-            }
-            GameObject gameObject9 = Utilities.FindObject(GameObject.Find("Player"), "HelpNotifications");
-            if (gameObject9 != null)
-            {
-                gameObject9.SetActive(flag);
-            }
-            GameObject gameObject10 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "HelpNotifications");
-            if (gameObject10 != null)
-            {
-                gameObject10.SetActive(flag);
-            }
-            GameObject gameObject11 = Utilities.FindObject(GameObject.Find("Player"), "NotificationStack");
-            if (gameObject11 != null)
-            {
-                gameObject11.SetActive(flag);
-            }
-            GameObject gameObject12 = Utilities.FindObject(GameObject.Find("Player(Clone)"), "NotificationStack");
-            if (gameObject12 != null)
-            {
-                gameObject12.SetActive(flag);
-            }
-            GameObject gameObject13 = Utilities.FindObject(GameObject.Find("Manager"), "UI");
-            if (gameObject13 != null)
-            {
-                gameObject13.SetActive(flag);
-            }
-            GameObject gameObject14 = GameObject.Find("QuestTrackerVisibilityToggle");
-            if (gameObject14 != null)
-            {
-                gameObject14.SetActive(flag);
-            }
+            PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         // TEST 2
         private static bool TestMethode2(string[] mayCmdParam)
         {
+            PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         // TEST 3
         private static bool TestMethode3(string[] mayCmdParam)
         {
+            PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         // TEST 4
         private static bool TestMethode4(string[] mayCmdParam)
         {
+            PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         #endregion
