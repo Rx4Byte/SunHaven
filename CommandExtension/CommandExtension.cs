@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using Wish;
 
 namespace CommandExtension
@@ -124,8 +125,8 @@ namespace CommandExtension
         private static Dictionary<string, int> moneyIds = new Dictionary<string, int> { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
         private static Dictionary<string, int> xpIds = new Dictionary<string, int> { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
         private static Dictionary<string, int> bonusIds = new Dictionary<string, int> { { "health", 60009 }, { "mana", 60007 } };
-        private static List<string> tpLocations = new List<string>() { "throneroom", "nelvari6", "wishingwell", "altar", "hospital", "sunhaven", "farm", "nelvarifarm", "nelvarimine", "nelvarihome",
-                                                                        "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "dragon", "dungeon", "store", "beach" };
+        private static List<string> tpLocations = new List<string>() { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome",
+                                                                        "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = false;
         private static bool noclip = false;
@@ -138,6 +139,8 @@ namespace CommandExtension
         private static string playerNameForCommands;
         private static string gap = "  -  ";
         private static int ranOnceOnPlayerSpawn = 0;
+        private static string lastScene;
+        private static Vector2 lastLocation;
         private static Color Red = new Color(255, 0, 0);
         private static Color Green = new Color(0, 255, 0);
         private static Color Yellow = new Color(240, 240, 0);
@@ -883,60 +886,132 @@ namespace CommandExtension
                 return true;
             string scene = mayCmdParam[1];
             if (scene == "withergatefarm")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(126.125f, 83.6743f), "WithergateRooftopFarm"); //works
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(138f, 89.16582f), "WithergateRooftopFarm");
+            }
             else if (scene == "throneroom")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(21.5f, 8.681581f), "Throneroom");  //works - test
-            else if (scene == "nelvari6")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(320.3333f, 98.76098f), "Nelvari6"); //nelvari bottom bridge
-            else if (scene == "wishingwell" || scene.Contains("wishing"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(55.83683f, 42.80461f), "WishingWell"); //works - test
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(21.5f, 8.681581f), "Throneroom");
+            }
+            else if (scene == "nelvari")
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(320.3333f, 98.76098f), "Nelvari6");
+            }
+            else if (scene == "wishingwell")
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(55.83683f, 61.48384f), "WishingWell");
+            }
             else if (scene.Contains("altar"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(199.3957f, 122.6284f), "DynusAltar"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(199.3957f, 122.6284f), "DynusAltar");
+            }
             else if (scene.Contains("hospital"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(80.83334f, 65.58415f), "Hospital"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(80.83334f, 65.58415f), "Hospital");
+            }
             else if (scene.Contains("sunhaven"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(268.125f, 299.9311f), "Town10"); //good
-            else if (scene.Contains("homefarm") || scene.Contains("sunhavenhome") || scene.Contains("playerfarm") || scene == "farm")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(357f, 124.3919f), "2Playerfarm"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(268.125f, 299.9311f), "Town10");
+            }
             else if (scene.Contains("nelvarifarm"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(148.25f, 100.8806f), "NelvariFarm"); //good
-            else if (scene.Contains("nelvarimine")) //new Vector2(154.1667f, 157.2463f)
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(144.7558f, 111.1503f), "NelvariMinesEntrance"); //works - test
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(139.6753f, 100.4739f), "NelvariFarm");
+            }
+            else if (scene.Contains("nelvarimine"))
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(144.7133f, 152.1591f), "NelvariMinesEntrance");
+            }
             else if (scene.Contains("nelvarihome"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(51.5f, 54.97755f), "NelvariPlayerHouse"); //good
-            else if (scene.Contains("castle")) //new Vector2(24.25f, 86.09025f)
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(133.6865f, 163.3773f), "Withergatecastleentrance"); //works - test
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(51.5f, 54.97755f), "NelvariPlayerHouse");
+            }
+            else if (scene.Contains("castle"))
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(133.7634f, 229.2485f), "Withergatecastleentrance");
+            }
             else if (scene.Contains("withergatehome"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(63.5f, 54.624f), "WithergatePlayerApartment"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(63.5f, 54.624f), "WithergatePlayerApartment");
+            }
             else if (scene.Contains("grandtree"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(314.4297f, 235.2298f), "GrandTreeEntrance1"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(314.4297f, 235.2298f), "GrandTreeEntrance1");
+            }
             else if (scene.Contains("taxi"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(101.707f, 123.4622f), "WildernessTaxi"); //works
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(101.707f, 123.4622f), "WildernessTaxi");
+            }
             else if (scene == "dynus")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(94.5f, 121.09f), "Dynus"); //good
-            else if (scene == "sewer") // new Vector2(13.70833f, 134.4075f)
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(134.5833f, 129.813f), "Sewer"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(94.5f, 121.09f), "Dynus");
+            }
+            else if (scene == "sewer")
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(134.5833f, 129.813f), "Sewer");
+            }
             else if (scene == "nivara")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(99.5f, 194.3229f), "Nivara"); //works - test
-            else if (scene == "barracks")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(71.58334f, 54.56507f), "Barracks"); //good
-            else if (scene.Contains("dragon"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(114f, 73.7052f), "DragonsMeet"); //works - test
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(99f, 266.6305f), "Nivara");
+            }
+            else if (scene.Contains("barrack"))
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(71.58334f, 54.56507f), "Barracks");
+            }
+            else if (scene.Contains("elios"))
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(113.9856f, 104.2902f), "DragonsMeet");
+            }
             else if (scene.Contains("dungeon"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(136.48f, 193.92f), "CombatDungeonEntrance"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(136.48f, 193.92f), "CombatDungeonEntrance");
+            }
             else if (scene.Contains("store"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(77.5f, 58.55f), "GeneralStore"); //good
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(77.5f, 58.55f), "GeneralStore");
+            }
             else if (scene.Contains("beach"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(96.491529f, 64.69862f), "BeachRevamp");
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(96.491529f, 87.46871f), "BeachRevamp");
+            }
+            else if (scene == "home" || scene.Contains("sunhavenhome") || scene == "farm")
+            {
+                lastScene = ScenePortalManager.ActiveSceneName; lastLocation = Player.Instance.transform.position;
+                ScenePortalManager.Instance.ChangeScene(new Vector2(316.4159f, 152.5824f), "2Playerfarm");
+            }
+            else if (scene == "back")
+                ScenePortalManager.Instance.ChangeScene(lastLocation, lastScene);
             else
                 CommandFunction_PrintToChat("invalid scene name".ColorText(Color.red));
+
             return true;
         }
 
         private static bool CommandFunction_TeleportLoactions()
         {
             foreach (string tpLocation in tpLocations)
-                CommandFunction_PrintToChat(tpLocation.ColorText(Color.white) + "\n");
+                CommandFunction_PrintToChat(tpLocation.ColorText(Color.white));
             return true;
         }
         #endregion
