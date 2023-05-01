@@ -135,20 +135,13 @@ namespace Testing
         // hide ui
         private static bool TestMethode1(string[] mayCmdParam)
         {
-            if (true)  // empty/on or not
+            if (false)  // empty/on or not
             {
                 // TEST CODE
-                int sceneCount = SceneManager.sceneCountInBuildSettings;
-                for (int i = 0; i < sceneCount; i++)
-                {
-                    string scenePatch = SceneUtility.GetScenePathByBuildIndex(i);
-                    string sceneName = SceneManager.GetSceneByPath(scenePatch).name;
-                    if (sceneName != null && sceneName.Length >= 1)
-                        PrintToChat(i.ToString() + ": " + SceneManager.GetSceneByPath(scenePatch).name);
-                }
+                
 
                 // FEEDBACK
-                PrintToChat("get scene name".ColorText(Color.green));
+                PrintToChat("     ".ColorText(Color.green));
             }
             else
                 PrintToChat("empty methode".ColorText(Color.red));
@@ -159,15 +152,13 @@ namespace Testing
         // TEST 2
         private static bool TestMethode2(string[] mayCmdParam)
         {
-            if (true)  // empty/on or not
+            if (false)  // empty/on or not
             {
                 // TEST CODE
-                string filePath = "M:\\SteamLibrary\\steamapps\\common\\Sun Haven\\file.txt";
-                foreach (string sceneData in scenesToLoad)
-                    File.AppendAllText(filePath, sceneData + "\n");
+
 
                 // FEEDBACK
-                PrintToChat("written to file".ColorText(Color.green));
+                PrintToChat("     ".ColorText(Color.green));
             }
             else
                 PrintToChat("empty methode".ColorText(Color.red));
@@ -176,15 +167,13 @@ namespace Testing
         // TEST 3
         private static bool TestMethode3(string[] mayCmdParam)
         {
-            if (true)  // empty/on or not
+            if (false)  // empty/on or not
             {
                 // TEST CODE
-                List<string> progresses = new List<string>() { "UnlockedWithergate", "Apartment", "NelvariFarm", "UnlockedNelvari", "ConfrontingDynus4Quest" };
-                foreach (string progress in progresses)
-                    SingletonBehaviour<GameSave>.Instance.SetProgressBoolCharacter(progress, true);
+
 
                 // FEEDBACK
-                PrintToChat("progess set".ColorText(Color.green));
+                PrintToChat("   ".ColorText(Color.green));
             }
             else
                 PrintToChat("empty methode".ColorText(Color.red));
@@ -193,14 +182,13 @@ namespace Testing
         // TEST 4
         private static bool TestMethode4(string[] mayCmdParam)
         {
-            if (true)  // empty/on or not
+            if (false)  // empty/on or not
             {
                 // TEST CODE
-                if (mayCmdParam.Length >= 2)
-                    teleport(mayCmdParam[1]);
+                
 
                 // FEEDBACK
-                PrintToChat("teleport".ColorText(Color.green));
+                PrintToChat("    ".ColorText(Color.green));
             }
             else
                 PrintToChat("empty methode".ColorText(Color.red));
@@ -212,7 +200,7 @@ namespace Testing
             if (true)  // empty/on or not
             {
                 // TEST CODE
-                PrintToChat(Player.Instance.ExactPosition.x.ToString() + " : " + Player.Instance.ExactPosition.y.ToString());
+                PrintToChat(Player.Instance.transform.position.x.ToString() + " : " + Player.Instance.transform.position.y.ToString());
 
                 // FEEDBACK
                 PrintToChat("get coords".ColorText(Color.green));
@@ -224,63 +212,11 @@ namespace Testing
         #endregion
 
         #region extra Methodes here if needed
-        private static void teleport(string sceneName)
-        {
-            string text = sceneName.ToLower().Replace(" ","");
-            if (text == "withergatefarm")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(126.125f, 83.6743f), "WithergateRooftopFarm"); //works
-            else if (text == "throneroom")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(21.5f, 8.681581f), "Throneroom");  //works - test
-            else if (text == "nelvari6")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(320.3333f, 98.76098f), "Nelvari6"); //nelvari bottom bridge
-            else if (text == "wishingwell" || text.Contains("wishing"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(55.83683f, 42.80461f), "WishingWell"); //works - test
-            else if (text.Contains("altar"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(199.3957f, 122.6284f), "DynusAltar"); //good
-            else if (text.Contains("hospital"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(80.83334f, 65.58415f), "Hospital"); //good
-            else if (text.Contains("sunhaven"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(268.125f, 299.9311f), "Town10"); //good
-            else if (text.Contains("homefarm") || text.Contains("sunhavenhome") || text.Contains("playerfarm") || text == "farm")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(357f, 124.3919f), "2Playerfarm"); //good
-            else if (text.Contains("nelvarifarm"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(148.25f, 100.8806f), "NelvariFarm"); //good
-            else if (text.Contains("nelvarimine")) //new Vector2(154.1667f, 157.2463f)
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(144.7558f, 111.1503f), "NelvariMinesEntrance"); //works - test
-            else if (text.Contains("nelvarihome"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(51.5f, 54.97755f), "NelvariPlayerHouse"); //good
-            else if (text.Contains("castle")) //new Vector2(24.25f, 86.09025f)
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(133.6865f, 163.3773f), "Withergatecastleentrance"); //works - test
-            else if (text.Contains("withergatehome"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(63.5f, 54.624f), "WithergatePlayerApartment"); //good
-            else if (text.Contains("grandtree"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(314.4297f, 235.2298f), "GrandTreeEntrance1"); //good
-            else if (text.Contains("taxi"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(101.707f, 123.4622f), "WildernessTaxi"); //works
-            else if (text == "dynus")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(94.5f, 121.09f), "Dynus"); //good
-            else if (text == "sewer") // new Vector2(13.70833f, 134.4075f)
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(134.5833f, 129.813f), "Sewer"); //good
-            else if (text == "nivara")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(99.5f, 194.3229f), "Nivara"); //works - test
-            else if (text == "barracks")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(71.58334f, 54.56507f), "Barracks"); //good
-            else if (text.Contains("dragon"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(114f, 73.7052f), "DragonsMeet"); //works - test
-            else if (text.Contains("dungeon"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(136.48f, 193.92f), "CombatDungeonEntrance"); //good
-            else if (text.Contains("store"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(77.5f, 58.55f), "GeneralStore"); //good
-            else if (text.Contains("beach"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(96.491529f, 64.69862f), "BeachRevamp");
-            else
-                PrintToChat("invalid scene name".ColorText(Color.red));
-        }
-
+        
         #endregion
 
         #region Patches
-        
+
         #endregion
     }
 }
