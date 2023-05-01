@@ -8,7 +8,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using UnityEngine;
-using UnityEngine.SceneManagement;
+using System.IO;
 using Wish;
 
 namespace CommandExtension
@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.7";
+        public const string PLUGIN_VERSION = "1.1.9";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -122,11 +122,16 @@ namespace CommandExtension
         #endregion
         // ITEM ID's
         private static Dictionary<string, int> allIds = ItemDatabase.ids;
-        private static Dictionary<string, int> moneyIds = new Dictionary<string, int> { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
-        private static Dictionary<string, int> xpIds = new Dictionary<string, int> { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
-        private static Dictionary<string, int> bonusIds = new Dictionary<string, int> { { "health", 60009 }, { "mana", 60007 } };
-        private static List<string> tpLocations = new List<string>() { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome",
-                                                                        "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
+        private static Dictionary<string, int> moneyIds = new Dictionary<string, int>() { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
+        private static Dictionary<string, int> xpIds = new Dictionary<string, int>() { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
+        private static Dictionary<string, int> bonusIds = new Dictionary<string, int>() { { "health", 60009 }, { "mana", 60007 } };
+        private static Dictionary<string, Dictionary<string, int>> categorizedItems = new Dictionary<string, Dictionary<string, int>>() 
+            { { "Furniture Items", new Dictionary<string, int>() },  { "Craftable Items", new Dictionary<string, int>() }, 
+            { "Useable Items", new Dictionary<string, int>() }, { "Monster Items", new Dictionary<string, int>() },
+            { "Equipable Items", new Dictionary<string, int>() }, { "Quest Items", new Dictionary<string, int>() }, { "Other Items", new Dictionary<string, int>() } };
+        private static List<string> tpLocations = new List<string>() 
+            { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome", 
+                "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = false;
         private static bool noclip = false;
@@ -310,6 +315,33 @@ namespace CommandExtension
         }
         #endregion
 
+        // Categorize all items
+        #region Categorize 'ItemDatabase.ids' into 'categorizedItems'
+        private static bool CategorizeItemList() 
+        {
+            if (ItemDatabase.ids == null || ItemDatabase.ids.Count < 1)
+                return false;
+            foreach (var item in allIds) 
+            {
+                if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Furniture)
+                    categorizedItems["Furniture Items"].Add(item.Key, item.Value);
+                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Equip)
+                    categorizedItems["Equipable Items"].Add(item.Key, item.Value);
+                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Quest)
+                    categorizedItems["Quest Items"].Add(item.Key, item.Value);
+                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Craftable)
+                    categorizedItems["Craftable Items"].Add(item.Key, item.Value);
+                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Monster)
+                    categorizedItems["Monster Items"].Add(item.Key, item.Value);
+                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Use)
+                    categorizedItems["Useable Items"].Add(item.Key, item.Value);
+                else
+                    categorizedItems["Other Items"].Add(item.Key, item.Value);
+            }
+            return true;
+        }
+        #endregion
+
         // command methodes
         #region CommandFunction - Methode's
         // PRINT FUNCTION **
@@ -351,27 +383,69 @@ namespace CommandExtension
             switch ((mayCommandParam.Length >= 2) ? mayCommandParam[1][0] : '-')
             {
                 case 'x':
-                    CommandFunction_PrintToChat("[XP-IDs]".ColorText(Color.black));
+                    CommandFunction_PrintToChat("[XP-ITEM-IDs]".ColorText(Color.black));
                     foreach (KeyValuePair<string, int> id in xpIds)
                         CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
                     break;
                 case 'm':
-                    CommandFunction_PrintToChat("[MONEY-IDs]".ColorText(Color.black));
+                    CommandFunction_PrintToChat("[MONEY-ITEM-IDs]".ColorText(Color.black));
                     foreach (KeyValuePair<string, int> id in moneyIds)
                         CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
                     break;
                 case 'a':
-                    CommandFunction_PrintToChat("[COMPLETE-IDs]".ColorText(Color.black));
-                    foreach (KeyValuePair<string, int> id in allIds)
-                        CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
+                    if (CategorizeItemList())
+                    {
+                        string file = Application.dataPath.Substring(0, Application.dataPath.LastIndexOf("/")) + "\\itemIDs(CommandExtension).txt";
+                        if (!File.Exists(file))
+                        {
+                            using (File.Create(file)) { }
+                        }
+                        bool isEmpty = true;
+                        File.WriteAllText(file, "");
+                        string overviewLine = new string('#', 80);
+                        foreach (var category in categorizedItems)
+                        {
+                            if (category.Value.Count >= 1)
+                            {
+                                if (isEmpty)
+                                {
+                                    File.AppendAllText(file, $"[{category.Key}]\n");
+                                    isEmpty = false;
+                                }
+                                else
+                                    File.AppendAllText(file, $"\n\n\n{overviewLine}\n[{category.Key}]\n");
+                                foreach (var item in category.Value.OrderBy(i => i.Key))
+                                {
+                                    File.AppendAllText(file, $"{item.Key} : {item.Value}\n");
+                                }
+                                File.AppendAllText(file, "");
+                            }
+                        }
+                        CommandFunction_PrintToChat("ID list created inside your Sun Haven folder:".ColorText(Color.green));
+                        CommandFunction_PrintToChat(file.ColorText(Color.white));
+                    }
+                    else
+                        CommandFunction_PrintToChat("ERROR: ".ColorText(Red) + "ItemDatabase.ids".ColorText(Color.white) + " is empty!".ColorText(Red));
                     break;
                 case 'b':
-                    CommandFunction_PrintToChat("[BONUS-IDs]".ColorText(Color.black));
+                    CommandFunction_PrintToChat("[BONUS-ITEM-IDs]".ColorText(Color.black));
                     foreach (KeyValuePair<string, int> id in bonusIds)
                         CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
                     break;
+                case 'f':
+                    CommandFunction_PrintToChat("[FURNITURE-ITEM-IDs]".ColorText(Color.black));
+                    foreach (KeyValuePair<string, int> id in allIds)
+                        if (ItemDatabase.GetItemData(id.Value).category == ItemCategory.Furniture)
+                            CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
+                    break;
+                case 'q':
+                    CommandFunction_PrintToChat("[QUEST-ITEM-IDs]".ColorText(Color.black));
+                    foreach (KeyValuePair<string, int> id in allIds)
+                        if (ItemDatabase.GetItemData(id.Value).category == ItemCategory.Quest)
+                            CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
+                    break;
                 default:
-                    CommandFunction_PrintToChat(CmdPrintItemIds + " [xp|money|all|bonus]".ColorText(Red));
+                    CommandFunction_PrintToChat(CmdPrintItemIds + " [xp|money|all|bonus|furniture|quest]".ColorText(Red));
                     return true;
             }
             return true;
