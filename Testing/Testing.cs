@@ -203,7 +203,7 @@ namespace Testing
                 PrintToChat(Player.Instance.transform.position.x.ToString() + " : " + Player.Instance.transform.position.y.ToString());
 
                 // FEEDBACK
-                PrintToChat("get coords".ColorText(Color.green));
+                PrintToChat("get coordinates".ColorText(Color.green));
             }
             else
                 PrintToChat("empty methode".ColorText(Color.red));
