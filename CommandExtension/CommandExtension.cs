@@ -124,32 +124,8 @@ namespace CommandExtension
         private static Dictionary<string, int> moneyIds = new Dictionary<string, int> { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
         private static Dictionary<string, int> xpIds = new Dictionary<string, int> { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
         private static Dictionary<string, int> bonusIds = new Dictionary<string, int> { { "health", 60009 }, { "mana", 60007 } };
-        private static Dictionary<string, string> tpLocations = new Dictionary<string, string>()
-        {
-            { "Throneroom", "throneroom" },
-            { "Nelvari", "nelvari6" },
-            { "Wishing Well", "wishingwell" },
-            { "Dynus Altar", "altar" },
-            { "Hospital", "hospital" },
-            { "Sun Haven", "sunhaven" },
-            { "Sun Haven Farm", "farm" },
-            { "Nelvari Farm", "nelvarifarm" },
-            { "Nelvari Mines", "nelvarimine" },
-            { "Nelvari Home", "nelvarihome" },
-            { "Withergate Farm", "withergatefarm" },
-            { "Withergate Castle", "castle" },
-            { "Withergate Apartment", "withergatehome" },
-            { "Grand Tree", "grandtree"  },
-            { "Wilderness Taxi", "taxi" },
-            { "Dynus", "dynus" },
-            { "Sewer", "sewer" },
-            { "Nivara", "nivara" },
-            { "Barracks", "barracks" },
-            { "Dragon", "dragon" },
-            { "Combat Dungeon", "dungeon" },
-            { "General Store", "store" },
-            { "Beach", "beach" }
-        };
+        private static List<string> tpLocations = new List<string>() { "throneroom", "nelvari6", "wishingwell", "altar", "hospital", "sunhaven", "farm", "nelvarifarm", "nelvarimine", "nelvarihome",
+                                                                        "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "dragon", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = false;
         private static bool noclip = false;
@@ -219,7 +195,7 @@ namespace CommandExtension
         public static bool CheckIfCommandSendChatMessage(string mayCommand)
         {
             mayCommand = mayCommand.ToLower();
-            if (mayCommand[0] != '!' || GetPlayerForCommand() == null && !mayCommand.Contains(CmdName))
+            if ((mayCommand[0] != '!' || GetPlayerForCommand() == null) && !mayCommand.Contains(CmdName))
                 return false;
 
             string[] mayCommandParam = mayCommand.Split(' ');
@@ -321,10 +297,10 @@ namespace CommandExtension
                 case CmdTeleport:
                     return CommandFunction_TeleportToScene(mayCommandParam);
 
-                //case CmdTeleportLocations:
-                //    return CommandFunction_PrintTeleportLoactions();
+                case CmdTeleportLocations:
+                    return CommandFunction_TeleportLoactions();
 
-                // no valid command found, execute debug methodes?
+                // no valid command found
                 default:
                     return false;
             }
@@ -905,7 +881,7 @@ namespace CommandExtension
         {
             if (mayCmdParam.Length <= 1)
                 return true;
-            string scene = mayCmdParam[1].ToLower().Replace(" ", "");
+            string scene = mayCmdParam[1];
             if (scene == "withergatefarm")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(126.125f, 83.6743f), "WithergateRooftopFarm"); //works
             else if (scene == "throneroom")
@@ -957,14 +933,12 @@ namespace CommandExtension
             return true;
         }
 
-        //private static bool CommandFunction_PrintTeleportLoactions()
-        //{
-        //    //foreach (string locationName in tpLocations.)
-        //    //{
-        //    //
-        //    //}
-        //    //return true;
-        //}
+        private static bool CommandFunction_TeleportLoactions()
+        {
+            foreach (string tpLocation in tpLocations)
+                CommandFunction_PrintToChat(tpLocation.ColorText(Color.white) + "\n");
+            return true;
+        }
         #endregion
         #endregion
 
