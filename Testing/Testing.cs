@@ -227,33 +227,10 @@ namespace Testing
         private static void teleport(string sceneName)
         {
             string text = sceneName.ToLower().Replace(" ","");
-            Vector2 destination;
-            if (text == "remove")
-                PrintToChat("");
-            else if (text == "playerhouse1")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(48f, 68f), "PlayerHouse1");
-            else if (text == "Tier1House0")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(48f, 68f), "Tier1House0");
-            else if (text == "town")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(67.41667f, 306.7076f), "Town");
-            else if (text == "town0")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(67.41667f, 306.7076f), "Town0");
-            else if (text == "withergate")
+            if (text == "withergatefarm")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(126.125f, 83.6743f), "WithergateRooftopFarm"); //works
             else if (text == "throneroom")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(21.5f, 8.681581f), "Throneroom");  //works - test
-            else if (text == "forest")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(21.67f, 7.5f), "Forest");
-            else if (text == "town2")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(67.41667f, 306.7076f), "Town2");
-            else if (text == "town1")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(67.41667f, 306.7076f), "Town1");
-            else if (text == "town5")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(67.41667f, 306.7076f), "Town5");
-            else if (text == "shoppingcenter")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(61.81f, 25f), "ShoppingCenter");
-            else if (text == "foresta")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(284.7917f, 355.3212f), "Foresta"); //useless
             else if (text == "nelvari6")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(320.3333f, 98.76098f), "Nelvari6"); //nelvari bottom bridge
             else if (text == "wishingwell" || text.Contains("wishing"))
@@ -264,24 +241,18 @@ namespace Testing
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(80.83334f, 65.58415f), "Hospital"); //good
             else if (text.Contains("sunhaven"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(268.125f, 299.9311f), "Town10"); //good
-            else if (text.Contains("homefarm") || text.Contains("home") || text.Contains("playerfarm") || text == "farm")
+            else if (text.Contains("homefarm") || text.Contains("sunhavenhome") || text.Contains("playerfarm") || text == "farm")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(357f, 124.3919f), "2Playerfarm"); //good
             else if (text.Contains("nelvarifarm"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(148.25f, 100.8806f), "NelvariFarm"); //good
-            //else if (text.Contains("homefarm"))
-            //    SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(130.9583f, 102.4126f), "NelvariFarm");
             else if (text.Contains("nelvarimine")) //new Vector2(154.1667f, 157.2463f)
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(144.7558f, 111.1503f), "NelvariMinesEntrance"); //works - test
-            else if (text.Contains("nelvariplayerhouse") || text.Contains("nelvarihome"))
+            else if (text.Contains("nelvarihome"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(51.5f, 54.97755f), "NelvariPlayerHouse"); //good
-            else if (text.Contains("withergatecastle") || text.Contains("castle")) //new Vector2(24.25f, 86.09025f)
+            else if (text.Contains("castle")) //new Vector2(24.25f, 86.09025f)
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(133.6865f, 163.3773f), "Withergatecastleentrance"); //works - test
-            //else if (text.Contains("withergatecastle") || text.Contains("castle")) //new Vector2(24.25f, 86.09025f)
-            //    SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(60.1f, 40.89222f), "WithergateCastleHallway"); //works - test
-            else if (text.Contains("withergateplayerapartment") || text.Contains("withergatehome"))
+            else if (text.Contains("withergatehome"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(63.5f, 54.624f), "WithergatePlayerApartment"); //good
-            else if (text == "playerapartmenthall")
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(70.33334f, 83.61538f), "PlayerApartmentHall"); //useless
             else if (text.Contains("grandtree"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(314.4297f, 235.2298f), "GrandTreeEntrance1"); //good
             else if (text.Contains("taxi"))
@@ -290,43 +261,26 @@ namespace Testing
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(94.5f, 121.09f), "Dynus"); //good
             else if (text == "sewer") // new Vector2(13.70833f, 134.4075f)
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(134.5833f, 129.813f), "Sewer"); //good
-            else if (text == "apartmentsewer" || text.Contains("sewerapartment"))
-                SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(129f, 124.5f), "ApartmentSewer"); //useless?
             else if (text == "nivara")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(99.5f, 194.3229f), "Nivara"); //works - test
             else if (text == "barracks")
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(71.58334f, 54.56507f), "Barracks"); //good
-            else if (text == "dragonsmeet" || text.Contains("dragon"))
+            else if (text.Contains("dragon"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(114f, 73.7052f), "DragonsMeet"); //works - test
-            else if (text.Contains("combatdungeon") || text.Contains("dungeon"))
+            else if (text.Contains("dungeon"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(136.48f, 193.92f), "CombatDungeonEntrance"); //good
             else if (text.Contains("store"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(77.5f, 58.55f), "GeneralStore"); //good
-            //else if (text.Contains("beach"))
-            //    SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(146.4583f, 104.4161f), "BeachTransition");
             else if (text.Contains("beach"))
                 SingletonBehaviour<ScenePortalManager>.Instance.ChangeScene(new Vector2(96.491529f, 64.69862f), "BeachRevamp");
-
             else
-            {
-                PrintToChat("invalid scene".ColorText(Color.red));
-                return;
-            }
+                PrintToChat("invalid scene name".ColorText(Color.red));
         }
 
         #endregion
 
         #region Patches
-        [HarmonyPatch(typeof(ScenePortalManager), "ChangeScene")]
-        class ScenePortalManager_ChangeScene_Patch
-        {
-            static void Postfix(Vector2 location, string sceneToLoad, UnityAction onComplete = null, UnityAction onFade = null, UnityAction onLoad = null, SceneFadeType fadeType = SceneFadeType.Circle, float fadeMultiplier = 1f)
-            {
-                PrintToChat("[SCENE]");
-                PrintToChat(sceneToLoad + "\n" + "x: " + location.x.ToString() + " | y: " + location.y.ToString() + "\n");
-                scenesToLoad.Add(sceneToLoad + "\n" + "x: " + location.x.ToString() + " | y: " + location.y.ToString() + "\n");
-            }
-        }
+        
         #endregion
     }
 }
