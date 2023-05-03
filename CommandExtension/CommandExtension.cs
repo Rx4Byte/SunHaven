@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.91";
+        public const string PLUGIN_VERSION = "1.1.92";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -89,41 +89,41 @@ namespace CommandExtension
         // COMMAND CREATION
         private static readonly Command[] Commands = new Command[]
         {
-            new Command(CmdHelp,                "print commands to chat",                                                   CommandState.None),
-            new Command(CmdMineReset,           "refill all mine shafts!",                                                  CommandState.None),
-            new Command(CmdPause,               "toggle time pause!",                                                       CommandState.Deactivated),
-            new Command(CmdCustomDaySpeed,      "toggle or change dayspeed, ignored if paused!",                            CommandState.Deactivated),
-            new Command(CmdMoney,               "give or remove coins",                                                     CommandState.None),
-            new Command(CmdOrbs,                "give or remove Orbs",                                                      CommandState.None),
-            new Command(CmdTickets,             "give or remove Tickets",                                                   CommandState.None),
-            new Command(CmdSetDate,             "set HOURE '6-23' e.g. 'set h 12'\nset DAY '1-28' e.g. 'set d 12'",         CommandState.None),
-            new Command(CmdWeather,             "set DAY '1-28' e.g. 'set d 12'",                                           CommandState.None),
-            new Command(CmdDevKit,              "get dev items",                                                            CommandState.None),
-            new Command(CmdJumper,              "jump over object's (actually noclip while jump)",                          CommandState.Deactivated),
-            new Command(CmdState,               "print activ commands",                                                     CommandState.None),
-            new Command(CmdPrintItemIds,        "print item ids [xp|money|all|bonus]",                                      CommandState.None),
-            new Command(CmdSleep,               "sleep to next the day",                                                    CommandState.None),
-            new Command(CmdDasher,              "infinite dashes",                                                          CommandState.Deactivated),
-            new Command(CmdManaFill,            "mana refill",                                                              CommandState.None),
-            new Command(CmdManaInf,             "infinite mana",                                                            CommandState.Deactivated),
-            new Command(CmdHealthFill,          "health refill",                                                            CommandState.None),
-            new Command(CmdNoHit,               "no hit (disable hitbox)",                                                  CommandState.Deactivated),
-            new Command(CmdMineOverfill,        "fill mine completely with rocks & ores",                                   CommandState.None),
-            new Command(CmdMineClear,           "clear mine completely from rocks & ores",                                  CommandState.None),
-            new Command(CmdNoClip,              "walk trough everything",                                                   CommandState.Deactivated),
-            new Command(CmdPrintHoverItem,      "print item id to chat",                                                    CommandState.Deactivated),
-            new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
-            new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
-            new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
-            new Command(CmdShowItems,           "print items with the given name",                                          CommandState.None),
-            new Command(CmdAutoFillMuseum,      "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
-            new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated),
-            new Command(CmdUI,                  "turn ui on/off",                                                           CommandState.None),
-            new Command(CmdTeleport,            "teleport to some locations",                                               CommandState.None),
-            new Command(CmdTeleportLocations,   "get teleport locations",                                                   CommandState.None),
-            new Command(CmdSpawnPet,            "spawn a specific pet 'pet [name]'",                                        CommandState.None),
-            new Command(CmdPetList,             "get the full list of pets '!pets'",                                        CommandState.None),
-            new Command(CmdAppendItemDescWithId,"toggle id shown to item description",                                      CommandState.Deactivated)
+            new Command(CmdHelp,                    "print commands to chat",                                                   CommandState.None),
+            new Command(CmdMineReset,               "refill all mine shafts!",                                                  CommandState.None),
+            new Command(CmdPause,                   "toggle time pause!",                                                       CommandState.Deactivated),
+            new Command(CmdCustomDaySpeed,          "toggle or change dayspeed, paused if '!pause' is activ!",                  CommandState.Deactivated),
+            new Command(CmdMoney,                   "give or remove coins",                                                     CommandState.None),
+            new Command(CmdOrbs,                    "give or remove Orbs",                                                      CommandState.None),
+            new Command(CmdTickets,                 "give or remove Tickets",                                                   CommandState.None),
+            new Command(CmdSetDate,                 "set HOURE '6-23' e.g. 'set h 12'\nset DAY '1-28' e.g. 'set d 12'",         CommandState.None),
+            new Command(CmdWeather,                 "'!weather [raining|heatwave|clear]'",                                      CommandState.None),
+            new Command(CmdDevKit,                  "get dev items",                                                            CommandState.None),
+            new Command(CmdJumper,                  "jump over object's (actually noclip while jump)",                          CommandState.Deactivated),
+            new Command(CmdState,                   "print activ commands",                                                     CommandState.None),
+            new Command(CmdPrintItemIds,            "print item ids [xp|money|all|bonus]",                                      CommandState.None),
+            new Command(CmdSleep,                   "sleep to next the day",                                                    CommandState.None),
+            new Command(CmdDasher,                  "infinite dashes",                                                          CommandState.Deactivated),
+            new Command(CmdManaFill,                "mana refill",                                                              CommandState.None),
+            new Command(CmdManaInf,                 "infinite mana",                                                            CommandState.Deactivated),
+            new Command(CmdHealthFill,              "health refill",                                                            CommandState.None),
+            new Command(CmdNoHit,                   "no hit (disable hitbox)",                                                  CommandState.Deactivated),
+            new Command(CmdMineOverfill,            "fill mine completely with rocks & ores",                                   CommandState.None),
+            new Command(CmdMineClear,               "clear mine completely from rocks & ores",                                  CommandState.None),
+            new Command(CmdNoClip,                  "walk trough everything",                                                   CommandState.Deactivated),
+            new Command(CmdPrintHoverItem,          "print item id to chat",                                                    CommandState.Deactivated),
+            new Command(CmdName,                    "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
+            new Command(CmdFeedbackDisabled,        "toggle command feedback on/off",                                           CommandState.Deactivated),
+            new Command(CmdGive,                    "give [ID] [AMOUNT]*",                                                      CommandState.None),
+            new Command(CmdShowItems,               "print items with the given name",                                          CommandState.None),
+            new Command(CmdAutoFillMuseum,          "toggle museum's auto fill upon entry",                                     CommandState.Deactivated),
+            new Command(CmdCheatFillMuseum,         "toggle fill museum completely upon entry",                                 CommandState.Deactivated),
+            new Command(CmdUI,                      "turn ui on/off",                                                           CommandState.None),
+            new Command(CmdTeleport,                "teleport to some locations",                                               CommandState.None),
+            new Command(CmdTeleportLocations,       "get teleport locations",                                                   CommandState.None),
+            new Command(CmdSpawnPet,                "spawn a specific pet 'pet [name]'",                                        CommandState.None),
+            new Command(CmdPetList,                 "get the full list of pets '!pets'",                                        CommandState.None),
+            new Command(CmdAppendItemDescWithId,    "toggle id shown to item description",                                      CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
