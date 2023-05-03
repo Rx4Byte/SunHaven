@@ -11,7 +11,10 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using Wish;
+using System.IO;
 using static System.Net.Mime.MediaTypeNames;
+using UnityEngine.SceneManagement;
+using UnityEngine.Events;
 
 namespace Testing
 {
@@ -27,6 +30,7 @@ namespace Testing
     public partial class CommandExtension : BaseUnityPlugin
     {
         private static readonly bool debug = true;
+        public static List<string> scenesToLoad = new List<string>();
         #region Awake() | Update() | OnGui()   -   BASE UNITY OBJECT METHODES
         private void Awake()
         {
@@ -64,13 +68,12 @@ namespace Testing
             }
             if (exit)
             {
-                foreach (string cmd in new string[] { "test1", "test2", "test3", "test4" })
+                foreach (string cmd in new string[] { "test1", "test2", "test3", "test4", "test5" })
                 {
-                    if (mayCmdParam[0] == cmd)
-                        break;
+                    if (mayCmdParam[0] == cmd || mayCmd.Contains(cmd))
+                        return true;
                     return false;
                 }
-                return true;
             }
             switch (mayCmdParam[0])
             {
@@ -92,6 +95,11 @@ namespace Testing
                 case "test4":
                     PrintToChat("[TEST-4]".ColorText(Color.black) + " start".ColorText(Color.white));
                     PrintToChat("[TEST-4]".ColorText(Color.black) + (TestMethode4(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
+                    return true;
+
+                case "test5":
+                    PrintToChat("[TEST-5]".ColorText(Color.black) + " start".ColorText(Color.white));
+                    PrintToChat("[TEST-5]".ColorText(Color.black) + (TestMethode5(mayCmdParam) ? " successful".ColorText(Color.green) : " failed".ColorText(Color.red)));
                     return true;
 
                 default:
@@ -123,31 +131,88 @@ namespace Testing
         #endregion
         #endregion
 
-        #region Methode's
+        #region Test Methode's
         // hide ui
         private static bool TestMethode1(string[] mayCmdParam)
         {
-            PrintToChat("empty methode".ColorText(Color.red));
+            if (false)  // empty/on or not
+            {
+                // TEST CODE
+                
+
+                // FEEDBACK
+                PrintToChat("     ".ColorText(Color.green));
+            }
+            else
+                PrintToChat("empty methode".ColorText(Color.red));
+            return true;
+            //PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         // TEST 2
         private static bool TestMethode2(string[] mayCmdParam)
         {
-            PrintToChat("empty methode".ColorText(Color.red));
+            if (false)  // empty/on or not
+            {
+                // TEST CODE
+
+
+                // FEEDBACK
+                PrintToChat("     ".ColorText(Color.green));
+            }
+            else
+                PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         // TEST 3
         private static bool TestMethode3(string[] mayCmdParam)
         {
-            PrintToChat("empty methode".ColorText(Color.red));
+            if (false)  // empty/on or not
+            {
+                // TEST CODE
+
+
+                // FEEDBACK
+                PrintToChat("   ".ColorText(Color.green));
+            }
+            else
+                PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
         // TEST 4
         private static bool TestMethode4(string[] mayCmdParam)
         {
-            PrintToChat("empty methode".ColorText(Color.red));
+            if (false)  // empty/on or not
+            {
+                // TEST CODE
+                
+
+                // FEEDBACK
+                PrintToChat("    ".ColorText(Color.green));
+            }
+            else
+                PrintToChat("empty methode".ColorText(Color.red));
             return true;
         }
+        // TEST 5
+        private static bool TestMethode5(string[] mayCmdParam)
+        {
+            if (true)  // empty/on or not
+            {
+                // TEST CODE
+                PrintToChat(Player.Instance.transform.position.x.ToString() + " : " + Player.Instance.transform.position.y.ToString());
+
+                // FEEDBACK
+                PrintToChat("get coordinates".ColorText(Color.green));
+            }
+            else
+                PrintToChat("empty methode".ColorText(Color.red));
+            return true;
+        }
+        #endregion
+
+        #region extra Methodes here if needed
+        
         #endregion
 
         #region Patches
