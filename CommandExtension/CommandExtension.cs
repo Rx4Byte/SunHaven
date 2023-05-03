@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.91";
+        public const string PLUGIN_VERSION = "1.1.9";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -71,7 +71,6 @@ namespace CommandExtension
         public const string CmdTeleportLocations = CmdPrefix + "tps";
         public const string CmdSpawnPet = CmdPrefix + "pet";
         public const string CmdPetList = CmdPrefix + "pets";
-        public const string CmdRelationship = CmdPrefix + "relationship";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -122,8 +121,7 @@ namespace CommandExtension
             new Command(CmdTeleport,            "teleport to some locations",                                               CommandState.None),
             new Command(CmdTeleportLocations,   "get teleport locations",                                                   CommandState.None),
             new Command(CmdSpawnPet,            "spawn a specific pet 'pet [name]'",                                        CommandState.None),
-            new Command(CmdPetList,             "get the full list of pets '!pets'",                                        CommandState.None),
-            new Command(CmdRelationship,        "set Relationship '!relationship [npc] [amount]'",                                CommandState.None)
+            new Command(CmdPetList,             "get the full list of pets '!pets'",                                        CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -131,15 +129,15 @@ namespace CommandExtension
         private static Dictionary<string, int> moneyIds = new Dictionary<string, int>() { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
         private static Dictionary<string, int> xpIds = new Dictionary<string, int>() { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
         private static Dictionary<string, int> bonusIds = new Dictionary<string, int>() { { "health", 60009 }, { "mana", 60007 } };
-        private static Dictionary<string, Dictionary<string, int>> categorizedItems = new Dictionary<string, Dictionary<string, int>>() 
-            { { "Furniture Items", new Dictionary<string, int>() },  { "Craftable Items", new Dictionary<string, int>() }, 
+        private static Dictionary<string, Dictionary<string, int>> categorizedItems = new Dictionary<string, Dictionary<string, int>>()
+            { { "Furniture Items", new Dictionary<string, int>() },  { "Craftable Items", new Dictionary<string, int>() },
             { "Useable Items", new Dictionary<string, int>() }, { "Monster Items", new Dictionary<string, int>() },
             { "Equipable Items", new Dictionary<string, int>() }, { "Quest Items", new Dictionary<string, int>() }, { "Other Items", new Dictionary<string, int>() } };
-        private static List<string> tpLocations = new List<string>() 
-            { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome", 
-                "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
-        private static Dictionary<string, NPCAI> npcs = NPCManager.Instance._npcs;
+        private static Dictionary<string, NPCAI> npcs = null;// NPCManager.Instance._npcs;
         private static Dictionary<string, Pet> petList = null;
+        private static List<string> tpLocations = new List<string>()
+            { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome",
+                "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = false;
         private static bool noclip = false;
@@ -314,16 +312,13 @@ namespace CommandExtension
                     return CommandFunction_TeleportToScene(mayCommandParam);
 
                 case CmdTeleportLocations:
-                    return CommandFunction_TeleportLoactions();
+                    return CommandFunction_TeleportLocations();
 
                 case CmdSpawnPet:
                     return CommandFunction_SpawnPet(mayCommandParam);
 
                 case CmdPetList:
                     return CommandFunction_GetPetList();
-
-                case CmdRelationship:
-                    return CommandFunction_SetRelationship(mayCommandParam);
 
                 // no valid command found
                 default:
@@ -334,11 +329,11 @@ namespace CommandExtension
 
         // Categorize all items
         #region Categorize 'ItemDatabase.ids' into 'categorizedItems'
-        private static bool CategorizeItemList() 
+        private static bool CategorizeItemList()
         {
             if (ItemDatabase.ids == null || ItemDatabase.ids.Count < 1)
                 return false;
-            foreach (var item in allIds) 
+            foreach (var item in allIds)
             {
                 if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Furniture)
                     categorizedItems["Furniture Items"].Add(item.Key, item.Value);
@@ -1098,8 +1093,8 @@ namespace CommandExtension
 
             return true;
         }
-        // TELEPORT LOCATIONS
-        private static bool CommandFunction_TeleportLoactions()
+        // GET TELEPORT LOCATIONS
+        private static bool CommandFunction_TeleportLocations()
         {
             foreach (string tpLocation in tpLocations)
                 CommandFunction_PrintToChat(tpLocation.ColorText(Color.white));
@@ -1136,29 +1131,6 @@ namespace CommandExtension
                 CommandFunction_PrintToChat(pet);
             return true;
         }
-        private static bool CommandFunction_SetRelationship(string[] mayCmdParam)
-        {
-            if (mayCmdParam.Length >= 3)
-            {
-                if (npcs != null)
-                {
-                    string name = mayCmdParam[1];
-                    float amount;
-                    if (!npcs.ContainsKey(name))
-                    {
-                        CommandFunction_PrintToChat($"no npc with the name {name} found! use '{"!npcs"}' for a list!".ColorText(Red));
-                        return true;
-                    }
-                    if (!float.TryParse(mayCmdParam[2], out amount))
-                    {
-                        CommandFunction_PrintToChat($"no valid number try '{"!relationships [name] 100".ColorText(Color.white)}'".ColorText(Red));
-                        return true;
-                    }
-                    GameSave.Instance.CurrentSave.characterData.Relationships[name] = amount;
-                }
-            }
-            return true;
-        }
         #endregion
         #endregion
 
@@ -1190,7 +1162,7 @@ namespace CommandExtension
                                     if (slotItemData.item == null || slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
                                         continue;
                                     if (!monster.name.ToLower().Contains("money"))
-                                    {   
+                                    {
                                         monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false);
                                         monster.UpdateFullness();
                                     }
@@ -1234,8 +1206,8 @@ namespace CommandExtension
                         Array.ForEach(FindObjectsOfType<MuseumBundleVisual>(), vPodium => typeof(MuseumBundleVisual).GetMethod("OnSaveInventory", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(vPodium, null));
                     }
                 }
-                
-                
+
+
             }
         }
         #endregion
@@ -1302,7 +1274,7 @@ namespace CommandExtension
                     ranOnceOnPlayerSpawn++;
                 else if (ranOnceOnPlayerSpawn == 2)
                     if (Commands[Array.FindIndex(Commands, command => command.Name == CmdFeedbackDisabled)].State == CommandState.Deactivated)
-                    { 
+                    {
                         CommandFunction_PrintToChat("> Command Extension Active! type '!help' for command list".ColorText(Color.magenta) + "\n -----------------------------------------------------------------".ColorText(Color.black));
                         ranOnceOnPlayerSpawn++;
                         if (debug)
