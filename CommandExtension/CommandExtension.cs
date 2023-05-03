@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.92";
+        public const string PLUGIN_VERSION = "1.1.91";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -78,14 +78,12 @@ namespace CommandExtension
         {
             public string Name { get; set; }
             public string Description { get; set; }
-            public string Help { get; set; }
             public CommandState State { get; set; }
-            public Command(string name, string description, CommandState state, string help)
+            public Command(string name, string description, CommandState state)
             {
                 Name = name;
                 Description = description;
                 State = state;
-                Help = help;
             }
         }
         // COMMAND CREATION
@@ -98,10 +96,10 @@ namespace CommandExtension
             new Command(CmdMoney,               "give or remove coins",                                                     CommandState.None),
             new Command(CmdOrbs,                "give or remove Orbs",                                                      CommandState.None),
             new Command(CmdTickets,             "give or remove Tickets",                                                   CommandState.None),
-            new Command(CmdSetDate,             "set HOURE '6-23' or DAY '1-28'",                                           CommandState.None),
+            new Command(CmdSetDate,             "set HOURE '6-23' e.g. 'set h 12'\nset DAY '1-28' e.g. 'set d 12'",         CommandState.None),
             new Command(CmdWeather,             "set DAY '1-28' e.g. 'set d 12'",                                           CommandState.None),
             new Command(CmdDevKit,              "get dev items",                                                            CommandState.None),
-            new Command(CmdJumper,              "jump over everything",                                                     CommandState.Deactivated),
+            new Command(CmdJumper,              "jump over object's (actually noclip while jump)",                          CommandState.Deactivated),
             new Command(CmdState,               "print activ commands",                                                     CommandState.None),
             new Command(CmdPrintItemIds,        "print item ids [xp|money|all|bonus]",                                      CommandState.None),
             new Command(CmdSleep,               "sleep to next the day",                                                    CommandState.None),
@@ -114,7 +112,7 @@ namespace CommandExtension
             new Command(CmdMineClear,           "clear mine completely from rocks & ores",                                  CommandState.None),
             new Command(CmdNoClip,              "walk trough everything",                                                   CommandState.Deactivated),
             new Command(CmdPrintHoverItem,      "print item id to chat",                                                    CommandState.Deactivated),
-            new Command(CmdName,                "set name for command target ('!name Lynn') only '!name' resets it",        CommandState.None),
+            new Command(CmdName,                "set name for command target ('!name Lynn') only '!name resets it' ",       CommandState.None),
             new Command(CmdFeedbackDisabled,    "toggle command feedback on/off",                                           CommandState.Deactivated),
             new Command(CmdGive,                "give [ID] [AMOUNT]*",                                                      CommandState.None),
             new Command(CmdShowItems,           "print items with the given name",                                          CommandState.None),
