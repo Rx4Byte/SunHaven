@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.9";
+        public const string PLUGIN_VERSION = "1.1.91";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -71,6 +71,7 @@ namespace CommandExtension
         public const string CmdTeleportLocations = CmdPrefix + "tps";
         public const string CmdSpawnPet = CmdPrefix + "pet";
         public const string CmdPetList = CmdPrefix + "pets";
+        public const string CmdAppendItemDescWithId = CmdPrefix + "showid";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -121,7 +122,8 @@ namespace CommandExtension
             new Command(CmdTeleport,            "teleport to some locations",                                               CommandState.None),
             new Command(CmdTeleportLocations,   "get teleport locations",                                                   CommandState.None),
             new Command(CmdSpawnPet,            "spawn a specific pet 'pet [name]'",                                        CommandState.None),
-            new Command(CmdPetList,             "get the full list of pets '!pets'",                                        CommandState.None)
+            new Command(CmdPetList,             "get the full list of pets '!pets'",                                        CommandState.None),
+            new Command(CmdAppendItemDescWithId,"toggle id shown to item description",                                      CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -133,17 +135,17 @@ namespace CommandExtension
             { { "Furniture Items", new Dictionary<string, int>() },  { "Craftable Items", new Dictionary<string, int>() },
             { "Useable Items", new Dictionary<string, int>() }, { "Monster Items", new Dictionary<string, int>() },
             { "Equipable Items", new Dictionary<string, int>() }, { "Quest Items", new Dictionary<string, int>() }, { "Other Items", new Dictionary<string, int>() } };
-        private static Dictionary<string, NPCAI> npcs = null;// NPCManager.Instance._npcs;
         private static Dictionary<string, Pet> petList = null;
         private static List<string> tpLocations = new List<string>()
             { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome",
                 "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
-        private static bool jumpOver = false;
-        private static bool noclip = false;
-        private static bool printOnHover = false;
-        private static bool infMana = false;
-        private static bool infAirSkips = false;
+        private static bool jumpOver = Commands[Array.FindIndex(Commands, command => command.Name == CmdJumper)].State == CommandState.Activated;
+        private static bool noclip = Commands[Array.FindIndex(Commands, command => command.Name == CmdNoClip)].State == CommandState.Activated;
+        private static bool printOnHover = Commands[Array.FindIndex(Commands, command => command.Name == CmdPrintHoverItem)].State == CommandState.Activated;
+        private static bool infMana = Commands[Array.FindIndex(Commands, command => command.Name == CmdManaInf)].State == CommandState.Activated;
+        private static bool infAirSkips = Commands[Array.FindIndex(Commands, command => command.Name == CmdDasher)].State == CommandState.Activated;
+        private static bool appendItemDescWithId = Commands[Array.FindIndex(Commands, command => command.Name == CmdAppendItemDescWithId)].State == CommandState.Activated;
         // ...
         private static float timeMultiplier = CommandParamDefaults.timeMultiplier;
         private static string playerNameForCommandsFirst;
@@ -319,6 +321,9 @@ namespace CommandExtension
 
                 case CmdPetList:
                     return CommandFunction_GetPetList();
+
+                case CmdAppendItemDescWithId:
+                    return CommandFunction_ShowID();
 
                 // no valid command found
                 default:
@@ -733,6 +738,15 @@ namespace CommandExtension
             int i = Array.FindIndex(Commands, command => command.Name == CmdDasher);
             Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
             bool flag = infAirSkips = Commands[i].State == CommandState.Activated;
+            CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
+            return true;
+        }
+        // SHOW ID
+        private static bool CommandFunction_ShowID()
+        {
+            int i = Array.FindIndex(Commands, command => command.Name == CmdAppendItemDescWithId);
+            Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
+            bool flag = appendItemDescWithId = Commands[i].State == CommandState.Activated;
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
@@ -1279,10 +1293,11 @@ namespace CommandExtension
                         ranOnceOnPlayerSpawn++;
                         if (debug)
                         {
-                            CommandFunction_PrintToChat("debug: use helping methodes");
-                            CommandFunction_InfiniteAirSkips();
+                            CommandFunction_PrintToChat("debug: enable cheat commands".ColorText(Color.magenta));
+                            CommandFunction_Jumper();
                             CommandFunction_InfiniteMana();
-                            CommandFunction_NoClip();
+                            CommandFunction_InfiniteAirSkips();
+                            CommandFunction_Pause();
                         }
                     }
             }
@@ -1349,10 +1364,35 @@ namespace CommandExtension
                 foreach (Type itemType in itemTypes)
                     yield return AccessTools.Method(itemType, "GetToolTip", new[] { typeof(Tooltip), typeof(int), typeof(bool) });
             }
-            static void Postfix(Item __instance)
+            static void Prefix(Item __instance)
             {
+                int id = __instance.ID();
                 if (printOnHover)
-                    CommandFunction_PrintToChat($"{__instance.ID()} : {ItemDatabase.GetItemData(__instance.ID()).name}");
+                    CommandFunction_PrintToChat($"{id} : {ItemDatabase.GetItemData(id).name}");
+                string text = "ID: ".ColorText(Color.magenta) + id.ToString().ColorText(Color.magenta) + "\"\n\"";
+                ItemData itemData = ItemDatabase.GetItemData(id);
+                if (appendItemDescWithId)
+                {
+                    if (!itemData.description.Contains(text))
+                        itemData.description = text + itemData.description;
+                }
+                else if (itemData.description.Contains(text))
+                    itemData.description = itemData.description.Replace(text, "");
+
+            }
+        }
+        #endregion
+
+        // append itemId to itemDescription
+        #region Patch_ItemData.FormattedDescription
+        [HarmonyPatch(typeof(ItemData))]
+        [HarmonyPatch("FormattedDescription", MethodType.Getter)]
+        class Patch_ItemDataFormattedDescription
+        {
+            static void Postfix(ref string __result, ItemData __instance)
+            {
+                if (debug)
+                    __result = __instance.id.ToString().ColorText(Color.magenta) + "\"\n\"";
             }
         }
         #endregion
