@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.9";
+        public const string PLUGIN_VERSION = "1.1.91";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -69,6 +69,9 @@ namespace CommandExtension
         public const string CmdUI = CmdPrefix + "ui";
         public const string CmdTeleport = CmdPrefix + "tp";
         public const string CmdTeleportLocations = CmdPrefix + "tps";
+        public const string CmdSpawnPet = CmdPrefix + "pet";
+        public const string CmdPetList = CmdPrefix + "pets";
+        public const string CmdRelationship = CmdPrefix + "relationship";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -117,7 +120,10 @@ namespace CommandExtension
             new Command(CmdCheatFillMuseum,     "toggle fill museum completely upon entry",                                 CommandState.Deactivated),
             new Command(CmdUI,                  "turn ui on/off",                                                           CommandState.None),
             new Command(CmdTeleport,            "teleport to some locations",                                               CommandState.None),
-            new Command(CmdTeleportLocations,   "get teleport locations",                                                   CommandState.None)
+            new Command(CmdTeleportLocations,   "get teleport locations",                                                   CommandState.None),
+            new Command(CmdSpawnPet,            "spawn a specific pet 'pet [name]'",                                        CommandState.None),
+            new Command(CmdPetList,             "get the full list of pets '!pets'",                                        CommandState.None),
+            new Command(CmdRelationship,        "set Relationship '!relationship [npc] [amount]'",                                CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -132,6 +138,8 @@ namespace CommandExtension
         private static List<string> tpLocations = new List<string>() 
             { "throneroom", "nelvari", "wishingwell", "altar", "hospital", "sunhaven", "sunhavenfarm/farm/home", "nelvarifarm", "nelvarimine", "nelvarihome", 
                 "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
+        private static Dictionary<string, NPCAI> npcs = NPCManager.Instance._npcs;
+        private static Dictionary<string, Pet> petList = null;
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = false;
         private static bool noclip = false;
@@ -307,6 +315,15 @@ namespace CommandExtension
 
                 case CmdTeleportLocations:
                     return CommandFunction_TeleportLoactions();
+
+                case CmdSpawnPet:
+                    return CommandFunction_SpawnPet(mayCommandParam);
+
+                case CmdPetList:
+                    return CommandFunction_GetPetList();
+
+                case CmdRelationship:
+                    return CommandFunction_SetRelationship(mayCommandParam);
 
                 // no valid command found
                 default:
@@ -1081,11 +1098,65 @@ namespace CommandExtension
 
             return true;
         }
-
+        // TELEPORT LOCATIONS
         private static bool CommandFunction_TeleportLoactions()
         {
             foreach (string tpLocation in tpLocations)
                 CommandFunction_PrintToChat(tpLocation.ColorText(Color.white));
+            return true;
+        }
+        // SPAWN PET
+        private static bool CommandFunction_SpawnPet(string[] mayCmdParam)
+        {
+            if (petList == null)
+                petList = (Dictionary<string, Pet>)typeof(PetManager).GetField("_petDictionary", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(PetManager.Instance);
+            if (petList != null)
+            {
+                if (mayCmdParam.Length >= 2)
+                {
+                    if (petList.ContainsKey(mayCmdParam[1]))
+                        PetManager.Instance.SpawnPet(mayCmdParam[1], Player.Instance, null);
+                    else
+                        CommandFunction_PrintToChat($"wrong pet name, get pets using '{"!pets".ColorText(Color.white)}'".ColorText(Red));
+                }
+                else
+                    CommandFunction_PrintToChat($"try '{"!pet [pet name]".ColorText(Color.white)}'!".ColorText(Red));
+            }
+            else
+                CommandFunction_PrintToChat("no 'petList'".ColorText(Red));
+            return true;
+        }
+        // GET PET LIST
+        private static bool CommandFunction_GetPetList()
+        {
+            if (petList == null)
+                petList = (Dictionary<string, Pet>)typeof(PetManager).GetField("_petDictionary", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(PetManager.Instance);
+            CommandFunction_PrintToChat("[PET-LIST]".ColorText(Color.black));
+            foreach (string pet in petList.Keys)
+                CommandFunction_PrintToChat(pet);
+            return true;
+        }
+        private static bool CommandFunction_SetRelationship(string[] mayCmdParam)
+        {
+            if (mayCmdParam.Length >= 3)
+            {
+                if (npcs != null)
+                {
+                    string name = mayCmdParam[1];
+                    float amount;
+                    if (!npcs.ContainsKey(name))
+                    {
+                        CommandFunction_PrintToChat($"no npc with the name {name} found! use '{"!npcs"}' for a list!".ColorText(Red));
+                        return true;
+                    }
+                    if (!float.TryParse(mayCmdParam[2], out amount))
+                    {
+                        CommandFunction_PrintToChat($"no valid number try '{"!relationships [name] 100".ColorText(Color.white)}'".ColorText(Red));
+                        return true;
+                    }
+                    GameSave.Instance.CurrentSave.characterData.Relationships[name] = amount;
+                }
+            }
             return true;
         }
         #endregion
