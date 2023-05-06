@@ -76,6 +76,7 @@ namespace CommandExtension
         public const string CmdRelationship = CmdPrefix + "relationship";
         public const string CmdUnMarry = CmdPrefix + "divorce";
         public const string CmdMarryNpc = CmdPrefix + "marry";
+
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -1209,25 +1210,25 @@ namespace CommandExtension
                 {
                     value = Math.Max(0, Math.Min(100, value));
                     NPCAI[] npcs = FindObjectsOfType<NPCAI>();
-                    foreach (NPCAI npcai in npcs)
+                    foreach (NPCAI npc in npcs)
                     {
-                        if (all || npcai.NPCName.ToLower() == name)
+                        if (all || npc.NPCName.ToLower() == name)
                         {
                             if (add)
                             {
-                                npcai.AddRelationship(value);
+                                npc.AddRelationship(value);
                                 if (!all)
                                 {
-                                    CommandFunction_PrintToChat($"Relationship with {npcai.NPCName.ColorText(Color.white)} is now {SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName].ToString().ColorText(Color.white)}!".ColorText(Green));
+                                    CommandFunction_PrintToChat($"Relationship with {npc.NPCName.ColorText(Color.white)} is now {SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npc.NPCName].ToString().ColorText(Color.white)}!".ColorText(Green));
                                     return true;
                                 }
                             }
                             else
                             {
-                                SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName] = value;
+                                SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npc.NPCName] = value;
                                 if (!all)
                                 {
-                                    CommandFunction_PrintToChat($"Relationship with {npcai.NPCName.ColorText(Color.white)} set to {value.ToString().ColorText(Color.white)}!".ColorText(Green));
+                                    CommandFunction_PrintToChat($"Relationship with {npc.NPCName.ColorText(Color.white)} set to {value.ToString().ColorText(Color.white)}!".ColorText(Green));
                                     return true;
                                 }
                             }
@@ -1236,7 +1237,7 @@ namespace CommandExtension
                     if (all)
                         CommandFunction_PrintToChat(add ? "Relationships increased!".ColorText(Green) : "Relationships set!".ColorText(Green));
                     else
-                        CommandFunction_PrintToChat($"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
+                        CommandFunction_PrintToChat($"No NPC with the name {name.ColorText(Color.white)} found!".ColorText(Red));
                 }
                 else
                     CommandFunction_PrintToChat($"NO VALID VALUE, try '{$"!relationship {name.ColorText(Color.white)} 10".ColorText(Color.white)}'".ColorText(Red));
