@@ -1208,7 +1208,6 @@ namespace CommandExtension
                 if (float.TryParse(mayCmdParam[2], out value))
                 {
                     value = Math.Max(0, Math.Min(100, value));
-                    CommandFunction_PrintToChat(value.ToString());
                     NPCAI[] npcs = FindObjectsOfType<NPCAI>();
                     foreach (NPCAI npcai in npcs)
                     {
