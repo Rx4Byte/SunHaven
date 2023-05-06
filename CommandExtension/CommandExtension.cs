@@ -1,4 +1,4 @@
-﻿using BepInEx;
+using BepInEx;
 using HarmonyLib;
 using QFSW.QC;
 using QFSW.QC.Utilities;
@@ -10,6 +10,7 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using System.IO;
 using Wish;
+using Sirenix.Serialization;
 
 namespace CommandExtension
 {
@@ -18,7 +19,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.92";
+        public const string PLUGIN_VERSION = "1.1.94";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -72,6 +73,9 @@ namespace CommandExtension
         public const string CmdSpawnPet = CmdPrefix + "pet";
         public const string CmdPetList = CmdPrefix + "pets";
         public const string CmdAppendItemDescWithId = CmdPrefix + "showid";
+        public const string CmdRelationship = CmdPrefix + "relationship";
+        public const string CmdUnMarry = CmdPrefix + "divorce";
+        public const string CmdMarryNpc = CmdPrefix + "marry";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -123,7 +127,10 @@ namespace CommandExtension
             new Command(CmdTeleportLocations,       "get teleport locations",                                                   CommandState.None),
             new Command(CmdSpawnPet,                "spawn a specific pet 'pet [name]'",                                        CommandState.None),
             new Command(CmdPetList,                 "get the full list of pets '!pets'",                                        CommandState.None),
-            new Command(CmdAppendItemDescWithId,    "toggle id shown to item description",                                      CommandState.Deactivated)
+            new Command(CmdAppendItemDescWithId,    "toggle id shown to item description",                                      CommandState.Deactivated),
+            new Command(CmdRelationship,            "'!relationship [name/all] [value] [add]*'",                                CommandState.None),
+            new Command(CmdUnMarry,                 "unmarry an NPC '!divorce [name/all]'",                                     CommandState.None),
+            new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -324,6 +331,15 @@ namespace CommandExtension
 
                 case CmdAppendItemDescWithId:
                     return CommandFunction_ShowID();
+
+                case CmdRelationship:
+                    return CommandFunction_Relationship(mayCommandParam);
+
+                case CmdUnMarry:
+                    return CommandFunction_UnMarry(mayCommandParam);
+
+                case CmdMarryNpc:
+                    return CommandFunction_MarryNPC(mayCommandParam);
 
                 // no valid command found
                 default:
@@ -1145,6 +1161,117 @@ namespace CommandExtension
                 CommandFunction_PrintToChat(pet);
             return true;
         }
+        // UN-MARRY NPC
+        private static bool CommandFunction_UnMarry(string[] mayCmdParam)
+        {
+            if (mayCmdParam.Length >= 2)
+            {
+                string name = mayCmdParam[1];
+                bool all = mayCmdParam[1] == "all";
+                NPCAI[] npcs = FindObjectsOfType<NPCAI>();
+                foreach (NPCAI npcai in npcs)
+                {
+                    if (all || npcai.NPCName.ToLower() == name)
+                    {
+                        npcai.MarryPlayer();
+                        string progressStringCharacter = SingletonBehaviour<GameSave>.Instance.GetProgressStringCharacter("MarriedWith");
+                        if (!progressStringCharacter.IsNullOrWhiteSpace())
+                        {
+                            SingletonBehaviour<GameSave>.Instance.SetProgressStringCharacter("MarriedWith", "");
+                            SingletonBehaviour<GameSave>.Instance.SetProgressBoolCharacter("Married", false);
+                            SingletonBehaviour<GameSave>.Instance.SetProgressBoolCharacter("MarriedTo" + progressStringCharacter, false);
+                            GameSave.CurrentCharacter.Relationships[progressStringCharacter] = 40f;
+                            SingletonBehaviour<NPCManager>.Instance.GetRealNPC(progressStringCharacter).GenerateCycle(false);
+                        }
+                        if (!all)
+                        {
+                            CommandFunction_PrintToChat($"You divorced {npcai.NPCName.ColorText(Color.white)}!".ColorText(Green));
+                            return true;
+                        }
+                    }
+                }
+                CommandFunction_PrintToChat(all ? "You divorced all NPCs!".ColorText(Green) : $"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
+            }
+            else
+                CommandFunction_PrintToChat("a name or parameter 'all' needed");
+            return true;
+        }
+        // SET RELATIONSHIP
+        private static bool CommandFunction_Relationship(string[] mayCmdParam)
+        {
+            if (mayCmdParam.Length >= 3)
+            {
+                float value;
+                string name = mayCmdParam[1];
+                bool all = mayCmdParam[1] == "all";
+                bool add = mayCmdParam.Length >= 4 && mayCmdParam[3] == "add";
+                if (float.TryParse(mayCmdParam[2], out value))
+                {
+                    value = Math.Max(0, Math.Min(100, value));
+                    NPCAI[] npcs = FindObjectsOfType<NPCAI>();
+                    foreach (NPCAI npcai in npcs)
+                    {
+                        if (all || npcai.NPCName.ToLower() == name)
+                        {
+                            if (add)
+                            {
+                                npcai.AddRelationship(value);
+                                if (!all)
+                                {
+                                    CommandFunction_PrintToChat($"Relationship with {npcai.NPCName.ColorText(Color.white)} is now {SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName].ToString().ColorText(Color.white)}!".ColorText(Green));
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName] = value;
+                                if (!all)
+                                {
+                                    CommandFunction_PrintToChat($"Relationship with {npcai.NPCName.ColorText(Color.white)} set to {value.ToString().ColorText(Color.white)}!".ColorText(Green));
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                    if (all)
+                        CommandFunction_PrintToChat(add ? "Relationships increased!".ColorText(Green) : "Relationships set!".ColorText(Green));
+                    else
+                        CommandFunction_PrintToChat($"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
+                }
+                else
+                    CommandFunction_PrintToChat($"NO VALID VALUE, try '{$"!relationship {name.ColorText(Color.white)} 10".ColorText(Color.white)}'".ColorText(Red));
+            }
+            return true;
+        }
+        // MARRY NPC
+        private static bool CommandFunction_MarryNPC(string[] mayCmdParam)
+        {
+            if (mayCmdParam.Length >= 2)
+            {
+                string name = mayCmdParam[1];
+                bool all = mayCmdParam[1] == "all";
+                NPCAI[] npcs = FindObjectsOfType<NPCAI>();
+                foreach (NPCAI npcai in npcs)
+                {
+                    if (all || npcai.NPCName.ToLower() == name)
+                    {
+
+                        if (SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName] < 100f)
+                            SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName] = 100f;
+                        npcai.MarryPlayer();
+                        if (!all)
+                        {
+                            CommandFunction_PrintToChat($"You married {npcai.NPCName.ColorText(Color.white)}!".ColorText(Green));
+                            return true;
+                        }
+                    }
+                }
+                CommandFunction_PrintToChat(all ? "You have married all NPCs!".ColorText(Green) : $"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
+            }
+            else
+                CommandFunction_PrintToChat("a name or parameter 'all' needed");
+            return true;
+        }
         #endregion
         #endregion
 
@@ -1176,19 +1303,19 @@ namespace CommandExtension
                                     if (slotItemData.item == null || slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
                                         continue;
                                     if (!monster.name.ToLower().Contains("money"))
-                                    {
                                         monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false);
-                                        monster.UpdateFullness();
-                                    }
                                     else if (monster.name.ToLower().Contains("money"))
                                     {
-                                        if (slotItemData.slot.itemToAccept.id == 60000)
+                                        if (slotItemData.slot.itemToAccept.id >= 60000 && slotItemData.slot.itemToAccept.id <= 60002)
                                             monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
-                                        else if (slotItemData.slot.itemToAccept.id == 60001)
-                                            monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
-                                        else if (slotItemData.slot.itemToAccept.id == 60002)
-                                            monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
+                                        //if (slotItemData.slot.itemToAccept.id == 60000)
+                                        //    monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
+                                        //else if (slotItemData.slot.itemToAccept.id == 60001)
+                                        //    monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
+                                        //else if (slotItemData.slot.itemToAccept.id == 60002)
+                                        //    monster.sellingInventory.AddItem(slotItemData.slot.itemToAccept.id, slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false, false);
                                     }
+                                    monster.UpdateFullness();
                                 }
                             }
                             else
