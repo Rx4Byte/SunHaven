@@ -1204,7 +1204,7 @@ namespace CommandExtension
                 float value;
                 string name = mayCmdParam[1];
                 bool all = mayCmdParam[1] == "all";
-                bool add = mayCmdParam.Contains("add");
+                bool add = mayCmdParam[3] == "add";
                 if (float.TryParse(mayCmdParam[2], out value))
                 {
                     value = Math.Max(0, Math.Min(100, value));
@@ -1233,7 +1233,8 @@ namespace CommandExtension
                             }
                         }
                     }
-                    CommandFunction_PrintToChat(all ? "Relationships increased!".ColorText(Green) : $"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
+                    CommandFunction_PrintToChat(all && add ? "Relationships increased!".ColorText(Green) : $"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
+                    CommandFunction_PrintToChat(all && !add ? "Relationships set!".ColorText(Green) : $"no npc with the name {name.ColorText(Color.white)} found!".ColorText(Red));
                 }
                 else
                     CommandFunction_PrintToChat($"NO VALID VALUE, try '{$"!relationship {name.ColorText(Color.white)} 10".ColorText(Color.white)}'".ColorText(Red));
