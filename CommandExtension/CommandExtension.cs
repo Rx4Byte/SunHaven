@@ -92,7 +92,7 @@ namespace CommandExtension
             }
         }
         // COMMAND CREATION
-        private static readonly Command[] Commands = new Command[]
+        public static Command[] Commands = new Command[]
         {
             new Command(CmdHelp,                    "print commands to chat",                                                   CommandState.None),
             new Command(CmdMineReset,               "refill all mine shafts!",                                                  CommandState.None),
