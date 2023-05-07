@@ -369,3 +369,5 @@ FodyWeavers.xsd
 /Testing/Properties/AssemblyInfo.cs
 /MuseumsHelper/Properties/AssemblyInfo.cs
 /Testing/OldTests.cs
+/Companion/Companion.csproj
+/Companion/Companion.cs
