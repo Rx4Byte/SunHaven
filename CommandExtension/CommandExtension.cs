@@ -10,7 +10,6 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using System.IO;
 using Wish;
-using Sirenix.Serialization;
 
 namespace CommandExtension
 {
@@ -76,6 +75,7 @@ namespace CommandExtension
         public const string CmdRelationship = CmdPrefix + "relationship";
         public const string CmdUnMarry = CmdPrefix + "divorce";
         public const string CmdMarryNpc = CmdPrefix + "marry";
+        public const string CmdSetSeason = CmdPrefix + "season";
 
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
@@ -131,7 +131,8 @@ namespace CommandExtension
             new Command(CmdAppendItemDescWithId,    "toggle id shown to item description",                                      CommandState.Deactivated),
             new Command(CmdRelationship,            "'!relationship [name/all] [value] [add]*'",                                CommandState.None),
             new Command(CmdUnMarry,                 "unmarry an NPC '!divorce [name/all]'",                                     CommandState.None),
-            new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None)
+            new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None),
+            new Command(CmdSetSeason,               "change season",                                                            CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -341,6 +342,9 @@ namespace CommandExtension
 
                 case CmdMarryNpc:
                     return CommandFunction_MarryNPC(mayCommandParam);
+
+                case CmdSetSeason:
+                    return CommandFunction_SetSeason(mayCommandParam);
 
                 // no valid command found
                 default:
@@ -616,10 +620,8 @@ namespace CommandExtension
                         case 'd':
                             if (dateValue <= 0 || dateValue > 28)
                             { CommandFunction_PrintToChat($"day {"1-28".ColorText(Color.white)} are allowed".ColorText(Red)); return true; }
-                            DateTime newDate = new DateTime(Date.Time.Year, Date.Time.Month, dateValue, Date.Time.Hour, Date.Time.Minute, Date.Time.Second, Date.Time.Millisecond).AddHours(1);
-                            DateTime updatedDate = newDate;
-                            typeof(DayCycle).GetField("previousDay", BindingFlags.NonPublic | BindingFlags.Instance).SetValue(FindObjectOfType<DayCycle>(), updatedDate.AddDays(-1));
-                            Date.Time = newDate;
+                            Date.Time = new DateTime(Date.Time.Year, Date.Time.Month, dateValue, Date.Time.Hour + 1, Date.Time.Minute, Date.Time.Second, Date.Time.Millisecond);
+                            typeof(DayCycle).GetMethod("SetInitialTime", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(DayCycle.Instance, null);
                             CommandFunction_PrintToChat($"{"Day".ColorText(Green)} set to {dateValue.ToString().ColorText(Color.white)}!".ColorText(Yellow));
                             break;
                         case 'h':
@@ -1271,6 +1273,16 @@ namespace CommandExtension
             }
             else
                 CommandFunction_PrintToChat("a name or parameter 'all' needed");
+            return true;
+        }
+        // SET SEASON
+        private static bool CommandFunction_SetSeason(string[] mayCmdParam)
+        {
+            if (mayCmdParam.Length < 2)
+            { CommandFunction_PrintToChat("specify the season!".ColorText(Red)); return true; }
+            if (!Enum.TryParse(mayCmdParam[1], true, out Season season2))
+            { CommandFunction_PrintToChat("no valid season!".ColorText(Red)); return true; }
+            DayCycle.Instance.SetSeason(season2);
             return true;
         }
         #endregion
