@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.94";
+        public const string PLUGIN_VERSION = "1.1.95";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -76,6 +76,7 @@ namespace CommandExtension
         public const string CmdUnMarry = CmdPrefix + "divorce";
         public const string CmdMarryNpc = CmdPrefix + "marry";
         public const string CmdSetSeason = CmdPrefix + "season";
+        public const string CmdFixYear = CmdPrefix + "yearfix";
 
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
@@ -132,7 +133,8 @@ namespace CommandExtension
             new Command(CmdRelationship,            "'!relationship [name/all] [value] [add]*'",                                CommandState.None),
             new Command(CmdUnMarry,                 "unmarry an NPC '!divorce [name/all]'",                                     CommandState.None),
             new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None),
-            new Command(CmdSetSeason,               "change season",                                                            CommandState.None)
+            new Command(CmdSetSeason,               "change season",                                                            CommandState.None),
+            new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -155,6 +157,7 @@ namespace CommandExtension
         private static bool infMana = Commands[Array.FindIndex(Commands, command => command.Name == CmdManaInf)].State == CommandState.Activated;
         private static bool infAirSkips = Commands[Array.FindIndex(Commands, command => command.Name == CmdDasher)].State == CommandState.Activated;
         private static bool appendItemDescWithId = Commands[Array.FindIndex(Commands, command => command.Name == CmdAppendItemDescWithId)].State == CommandState.Activated;
+        private static bool yearFix = Commands[Array.FindIndex(Commands, command => command.Name == CmdFixYear)].State == CommandState.Activated;
         // ...
         private static float timeMultiplier = CommandParamDefaults.timeMultiplier;
         private static string playerNameForCommandsFirst;
@@ -345,6 +348,9 @@ namespace CommandExtension
 
                 case CmdSetSeason:
                     return CommandFunction_SetSeason(mayCommandParam);
+
+                case CmdFixYear:
+                    return CommandFunction_ToggleYearFix();
 
                 // no valid command found
                 default:
@@ -1282,13 +1288,41 @@ namespace CommandExtension
             { CommandFunction_PrintToChat("specify the season!".ColorText(Red)); return true; }
             if (!Enum.TryParse(mayCmdParam[1], true, out Season season2))
             { CommandFunction_PrintToChat("no valid season!".ColorText(Red)); return true; }
-            DayCycle.Instance.SetSeason(season2);
+            var Date = DayCycle.Instance;
+            int targetYear = Date.Time.Year + ((int)season2 - (int)Date.Season + 4) % 4;
+            DayCycle.Instance.Time = new DateTime(targetYear, Date.Time.Month, 1, Date.Time.Hour, Date.Time.Minute, 0, DateTimeKind.Utc).ToUniversalTime();
+            typeof(DayCycle).GetMethod("SetInitialTime", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(DayCycle.Instance, null);
+            CommandFunction_PrintToChat("It's now ".ColorText(Yellow) + season2.ToString().ColorText(Green));
+            //DayCycle.Instance.SetSeason(season2);
+            return true;
+        }
+        // YEAR FIX
+        private static bool CommandFunction_ToggleYearFix()
+        {
+            int i = Array.FindIndex(Commands, command => command.Name == CmdFixYear);
+            Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
+            bool flag = Commands[i].State == CommandState.Activated;
+            yearFix = flag;
+            CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
         #endregion
         #endregion
 
         #region Patches
+        // Year fix
+        #region Patch_DayCycle.Year
+        [HarmonyPatch(typeof(DayCycle))]
+        [HarmonyPatch("Year", MethodType.Getter)]
+        public static class Patch_DayCycleYear
+        {
+            public static bool Prefix(ref int __result)
+            {
+                __result = (DayCycle.Day - 1) / 112 + 1;
+                return !yearFix;
+            }
+        }
+        #endregion
         // auto fill museum
         #region Patch_HungryMonster.SetMeta
         [HarmonyPatch(typeof(HungryMonster))]
