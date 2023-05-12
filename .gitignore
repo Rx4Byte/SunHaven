@@ -371,3 +371,4 @@ FodyWeavers.xsd
 /Testing/OldTests.cs
 /Companion/Companion.csproj
 /Companion/Companion.cs
+/Companion/Properties/AssemblyInfo.cs
