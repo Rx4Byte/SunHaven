@@ -44,7 +44,8 @@
     <Reference Include="Sirenix.Serialization">
       <HintPath>M:\SteamLibrary\steamapps\common\Sun Haven\Sun Haven_Data\Managed\Sirenix.Serialization.dll</HintPath>
     </Reference>
-    <Reference Include="SunHaven.Core">
+    <Reference Include="SunHaven.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>M:\SteamLibrary\steamapps\common\Sun Haven\Sun Haven_Data\Managed\SunHaven.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
