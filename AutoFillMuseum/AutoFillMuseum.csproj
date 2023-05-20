@@ -37,7 +37,8 @@
     <Reference Include="BepInEx">
       <HintPath>M:\SteamLibrary\steamapps\common\Sun Haven\BepInEx\core\BepInEx.dll</HintPath>
     </Reference>
-    <Reference Include="SunHaven.Core">
+    <Reference Include="SunHaven.Core, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>M:\SteamLibrary\steamapps\common\Sun Haven\Sun Haven_Data\Managed\SunHaven.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
