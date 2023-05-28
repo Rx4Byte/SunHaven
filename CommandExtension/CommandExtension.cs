@@ -69,6 +69,7 @@ namespace CommandExtension
         public const string CmdUI = CmdPrefix + "ui";
         public const string CmdTeleport = CmdPrefix + "tp";
         public const string CmdTeleportLocations = CmdPrefix + "tps";
+        public const string CmdDespawnPet = CmdPrefix + "despawnpet";
         public const string CmdSpawnPet = CmdPrefix + "pet";
         public const string CmdPetList = CmdPrefix + "pets";
         public const string CmdAppendItemDescWithId = CmdPrefix + "showid";
@@ -127,6 +128,7 @@ namespace CommandExtension
             new Command(CmdUI,                      "turn ui on/off",                                                           CommandState.None),
             new Command(CmdTeleport,                "teleport to some locations",                                               CommandState.None),
             new Command(CmdTeleportLocations,       "get teleport locations",                                                   CommandState.None),
+            new Command(CmdDespawnPet,              "despawn current pet'",                                                     CommandState.None),
             new Command(CmdSpawnPet,                "spawn a specific pet 'pet [name]'",                                        CommandState.None),
             new Command(CmdPetList,                 "get the full list of pets '!pets'",                                        CommandState.None),
             new Command(CmdAppendItemDescWithId,    "toggle id shown to item description",                                      CommandState.Deactivated),
@@ -162,6 +164,7 @@ namespace CommandExtension
         private static float timeMultiplier = CommandParamDefaults.timeMultiplier;
         private static string playerNameForCommandsFirst;
         private static string playerNameForCommands;
+        private static string lastPetName = "";
         private static string gap = "  -  ";
         private static int ranOnceOnPlayerSpawn = 0;
         private static string lastScene;
@@ -327,6 +330,9 @@ namespace CommandExtension
 
                 case CmdTeleportLocations:
                     return CommandFunction_TeleportLocations();
+
+                case CmdDespawnPet:
+                    return CommandFunction_DespawnPet();
 
                 case CmdSpawnPet:
                     return CommandFunction_SpawnPet(mayCommandParam);
@@ -1139,7 +1145,19 @@ namespace CommandExtension
                 CommandFunction_PrintToChat(tpLocation.ColorText(Color.white));
             return true;
         }
-        // SPAWN PET
+        // DESPAWN PET
+        private static bool CommandFunction_DespawnPet()
+        {
+            if (lastPetName == "")
+                CommandFunction_PrintToChat("No pet spawned by command".ColorText(Red));
+            else
+            {
+                PetManager.Instance.DespawnPet(Player.Instance);
+                lastPetName = "";
+                CommandFunction_PrintToChat($"Pet ({lastPetName.ColorText(Color.white)}) removed!".ColorText(Green));
+            }
+            return true;
+        }// SPAWN PET
         private static bool CommandFunction_SpawnPet(string[] mayCmdParam)
         {
             if (petList == null)
@@ -1148,8 +1166,26 @@ namespace CommandExtension
             {
                 if (mayCmdParam.Length >= 2)
                 {
-                    if (petList.ContainsKey(mayCmdParam[1]))
-                        PetManager.Instance.SpawnPet(mayCmdParam[1], Player.Instance, null);
+                    string petCmd = mayCmdParam[1];
+                    List<string> despawnCmds = new List<string> { "ds", "rm", "del", "despawn", "remove" };
+                    if (lastPetName != "")
+                    {
+                        foreach (string cmd in despawnCmds)
+                        {
+                            if (petCmd.Contains(cmd))
+                            {
+                                PetManager.Instance.DespawnPet(Player.Instance);
+                                lastPetName = "";
+                                CommandFunction_PrintToChat($"Pet ({lastPetName.ColorText(Color.white)}) removed!".ColorText(Green));
+                                return true;
+                            }
+                        }
+                    }
+                    if (petList.ContainsKey(petCmd))
+                    {
+                        PetManager.Instance.SpawnPet(petCmd, Player.Instance, null);
+                        lastPetName = petCmd;
+                    }
                     else
                         CommandFunction_PrintToChat($"wrong pet name, get pets using '{"!pets".ColorText(Color.white)}'".ColorText(Red));
                 }
@@ -1157,14 +1193,19 @@ namespace CommandExtension
                     CommandFunction_PrintToChat($"try '{"!pet [pet name]".ColorText(Color.white)}'!".ColorText(Red));
             }
             else
-                CommandFunction_PrintToChat("no 'petList'".ColorText(Red));
+                CommandFunction_PrintToChat("ISSUE: no 'petList', u can report this bug".ColorText(Red));
             return true;
         }
         // GET PET LIST
         private static bool CommandFunction_GetPetList()
         {
             if (petList == null)
+            {
                 petList = (Dictionary<string, Pet>)typeof(PetManager).GetField("_petDictionary", BindingFlags.NonPublic | BindingFlags.Instance).GetValue(PetManager.Instance);
+                if (petList == null)
+                    CommandFunction_PrintToChat("ISSUE: no 'petList', u can report this bug".ColorText(Red));
+                return true;
+            }
             CommandFunction_PrintToChat("[PET-LIST]".ColorText(Color.black));
             foreach (string pet in petList.Keys)
                 CommandFunction_PrintToChat(pet);
