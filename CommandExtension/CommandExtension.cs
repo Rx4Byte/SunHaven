@@ -1153,8 +1153,8 @@ namespace CommandExtension
             else
             {
                 PetManager.Instance.DespawnPet(Player.Instance);
-                lastPetName = "";
                 CommandFunction_PrintToChat($"Pet ({lastPetName.ColorText(Color.white)}) removed!".ColorText(Green));
+                lastPetName = "";
             }
             return true;
         }// SPAWN PET
@@ -1175,8 +1175,8 @@ namespace CommandExtension
                             if (petCmd.Contains(cmd))
                             {
                                 PetManager.Instance.DespawnPet(Player.Instance);
-                                lastPetName = "";
                                 CommandFunction_PrintToChat($"Pet ({lastPetName.ColorText(Color.white)}) removed!".ColorText(Green));
+                                lastPetName = "";
                                 return true;
                             }
                         }
