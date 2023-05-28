@@ -1173,17 +1173,19 @@ namespace CommandExtension
                 {
                     string petCmd = mayCmdParam[1];
                     List<string> despawnCmds = new List<string> { "ds", "rm", "del", "despawn", "remove" };
-                    if (lastPetName != "")
+                    foreach (string cmd in despawnCmds)
                     {
-                        foreach (string cmd in despawnCmds)
+                        if (petCmd.Contains(cmd))
                         {
-                            if (petCmd.Contains(cmd))
+                            if (lastPetName != "")
                             {
                                 PetManager.Instance.DespawnPet(Player.Instance);
                                 CommandFunction_PrintToChat($"Pet ({lastPetName.ColorText(Color.white)}) removed!".ColorText(Green));
                                 lastPetName = "";
-                                return true;
                             }
+                            else
+                                CommandFunction_PrintToChat("No pet spawned by command".ColorText(Red));
+                            return true;
                         }
                     }
                     if (petList.ContainsKey(petCmd))
