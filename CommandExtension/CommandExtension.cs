@@ -1172,7 +1172,7 @@ namespace CommandExtension
                 if (mayCmdParam.Length >= 2)
                 {
                     string petCmd = mayCmdParam[1];
-                    List<string> despawnCmds = new List<string> { "ds", "rm", "del", "despawn", "remove" };
+                    List<string> despawnCmds = new List<string> { "despawn", "remove" };
                     foreach (string cmd in despawnCmds)
                     {
                         if (petCmd.Contains(cmd))
