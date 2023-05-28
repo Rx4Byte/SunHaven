@@ -18,7 +18,7 @@ namespace CommandExtension
         public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Command Extension";
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
-        public const string PLUGIN_VERSION = "1.1.95";
+        public const string PLUGIN_VERSION = "1.1.97";
     }
 
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
@@ -78,7 +78,7 @@ namespace CommandExtension
         public const string CmdMarryNpc = CmdPrefix + "marry";
         public const string CmdSetSeason = CmdPrefix + "season";
         public const string CmdFixYear = CmdPrefix + "yearfix";
-
+        public const string CmdIncDecYear = CmdPrefix + "years";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -136,7 +136,8 @@ namespace CommandExtension
             new Command(CmdUnMarry,                 "unmarry an NPC '!divorce [name/all]'",                                     CommandState.None),
             new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None),
             new Command(CmdSetSeason,               "change season",                                                            CommandState.None),
-            new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Deactivated)
+            new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Deactivated),
+            new Command(CmdIncDecYear,              "add or sub years '!years [value]' '-' to sub",                             CommandState.None)
         };
         #endregion
         // ITEM ID's
@@ -357,6 +358,9 @@ namespace CommandExtension
 
                 case CmdFixYear:
                     return CommandFunction_ToggleYearFix();
+
+                case CmdIncDecYear:
+                    return CommandFunction_IncDecYear(mayCommand);
 
                 // no valid command found
                 default:
@@ -1157,7 +1161,8 @@ namespace CommandExtension
                 lastPetName = "";
             }
             return true;
-        }// SPAWN PET
+        }
+        // SPAWN PET
         private static bool CommandFunction_SpawnPet(string[] mayCmdParam)
         {
             if (petList == null)
@@ -1345,6 +1350,35 @@ namespace CommandExtension
             bool flag = Commands[i].State == CommandState.Activated;
             yearFix = flag;
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
+            return true;
+        }
+        // CHANGE YEAR
+        private static bool CommandFunction_IncDecYear(string mayCommand)
+        {
+            if (!int.TryParse(Regex.Match(mayCommand, @"\d+").Value, out int value))
+            {
+                CommandFunction_PrintToChat("Something wen't wrong..".ColorText(Red));
+                CommandFunction_PrintToChat("Try '!years 1' or '!years -1'".ColorText(Red));
+                return true;
+            }
+            var Date = DayCycle.Instance;
+            int newYear;
+            if (mayCommand.Contains("-"))
+            {
+                if (Date.Time.Year - (value * 4) >= 1)
+                    newYear = Date.Time.Year - (value * 4);
+                else
+                {
+                    CommandFunction_PrintToChat("must be in year 1 or above");
+                    return true;
+                }
+            }
+            else
+                newYear = Date.Time.Year + (value * 4);
+
+            DayCycle.Instance.Time = new DateTime(newYear, Date.Time.Month, Date.Time.Day, Date.Time.Hour, Date.Time.Minute, 0, DateTimeKind.Utc).ToUniversalTime();
+            typeof(DayCycle).GetMethod("SetInitialTime", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(DayCycle.Instance, null);
+            CommandFunction_PrintToChat($"It's now Year {(Date.Time.Year / 4).ToString().ColorText(Green)}!".ColorText(Yellow));
             return true;
         }
         #endregion
