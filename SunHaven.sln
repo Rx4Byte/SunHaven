@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutoFillMuseum", "AutoFillM
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Companion", "Companion\Companion.csproj", "{0C608F77-30ED-4919-B5A6-1C8A607C0D42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YearCorrection", "YearCorrection\YearCorrection.csproj", "{D41F92EB-469A-4E47-ACC9-36465A99D10D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{0C608F77-30ED-4919-B5A6-1C8A607C0D42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0C608F77-30ED-4919-B5A6-1C8A607C0D42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0C608F77-30ED-4919-B5A6-1C8A607C0D42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D41F92EB-469A-4E47-ACC9-36465A99D10D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D41F92EB-469A-4E47-ACC9-36465A99D10D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D41F92EB-469A-4E47-ACC9-36465A99D10D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D41F92EB-469A-4E47-ACC9-36465A99D10D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
