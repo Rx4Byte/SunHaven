@@ -137,7 +137,7 @@ namespace CommandExtension
             new Command(CmdUnMarry,                 "unmarry an NPC '!divorce [name/all]'",                                     CommandState.None),
             new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None),
             new Command(CmdSetSeason,               "change season",                                                            CommandState.None),
-            new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Deactivated),
+            new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Activated),
             new Command(CmdIncDecYear,              "add or sub years '!years [value]' '-' to sub",                             CommandState.None),
             new Command(CmdCheats,                  "Toggle Cheats and hotkeys like F7,F8",                                     CommandState.Deactivated)
         };
@@ -1459,43 +1459,43 @@ namespace CommandExtension
         {
         }
         [Command("devkit", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm14(string GetDevItems)
+        private static void fm14(string INFO_getDevItems)
         {
         }
         [Command("dasher", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm15(string infiniteAirJumps)
+        private static void fm15(string INFO_infiniteAirJumps)
         {
         }
         [Command("showid", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm16(string ShowsItemIdsInDescription)
+        private static void fm16(string INFO_ShowsItemIdsInDescription)
         {
         }
         [Command("manafill", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm17(string refillMana)
+        private static void fm17(string INFO_refillMana)
         {
         }
         [Command("manainf", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm18(string infiniteMana)
+        private static void fm18(string INFO_infiniteMana)
         {
         }
         [Command("healthfill", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm19(string refillHealth)
+        private static void fm19(string INFO_refillHealth)
         {
         }
         [Command("sleep", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm20(string sleepOnce)
+        private static void fm20(string INFO_sleepOnce)
         {
         }
         [Command("printhoveritem", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm21(string sendItemIdAndNameToChat)
+        private static void fm21(string INFO_sendItemIdAndNameToChat)
         {
         }
         [Command("feedback", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm22(string toggleCommandFeedback)
+        private static void fm22(string INFO_toggleCommandFeedback)
         {
         }
         [Command("pause", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm23(string pauseTime)
+        private static void fm23(string INFO_pauseTime)
         {
         }
         [Command("timespeed", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
@@ -1507,23 +1507,23 @@ namespace CommandExtension
         {
         }
         [Command("jumper", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm26(string toggleToJumpOverObjects)
+        private static void fm26(string INFO_toggleToJumpOverObjects)
         {
         }
         [Command("noclip", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm27(string toggleForNoclip)
+        private static void fm27(string INFO_toggleForNoclip)
         {
         }
         [Command("nohit", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm28(string toggleForGodMode)
+        private static void fm28(string INFO_toggleForGodMode)
         {
         }
         [Command("autofillmuseum", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm29(string autofillMusuemOnEnterMuseum)
+        private static void fm29(string INFO_autofillMusuemOnEnterMuseum)
         {
         }
         [Command("cheatfillmuseum", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm30(string cheatfillMusuemOnEnterMuseum)
+        private static void fm30(string INFO_cheatfillMusuemOnEnterMuseum)
         {
         }
         [Command("tp", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
@@ -1531,11 +1531,11 @@ namespace CommandExtension
         {
         }
         [Command("tps", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm32(string showTeleportLocations)
+        private static void fm32(string INFO_showTeleportLocations)
         {
         }
         [Command("despawnpet", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm33(string despawnPet)
+        private static void fm33(string INFO_despawnPet)
         {
         }
         [Command("pet", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
@@ -1543,7 +1543,7 @@ namespace CommandExtension
         {
         }
         [Command("pets", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm35(string showPetNames)
+        private static void fm35(string INFO_showPetNames)
         {
         }
         [Command("divorce", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
@@ -1563,15 +1563,15 @@ namespace CommandExtension
         {
         }
         [Command("yearfix", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm40(string toggleToShowTheCorrectYear)
+        private static void fm40(string INFO_toggleToShowTheCorrectYear)
         {
         }
         [Command("years", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
         private static void fm41(string yearsToAddOrSub)
         {
         }
-        [Command("cheatsoff", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm42(string toggleCheats_DefaultOn)
+        [Command("cheats", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm42(string INFO_toggleCheats_DefaultOn)
         {
         }
         #endregion
