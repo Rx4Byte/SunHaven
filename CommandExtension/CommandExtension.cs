@@ -1403,11 +1403,11 @@ namespace CommandExtension
         // duplicated "command methodes" (no functions) to use the in-game COMMAND feature
         #region fake methode to show commands while typing
         [Command("help", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm0(string showAllCommandsWithCurrentState)
+        private static void fm0(string INFO_showAllCommandsWithCurrentState)
         {
         }
         [Command("state", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm1(string showActivatedCommands)
+        private static void fm1(string INFO_showActivatedCommands)
         {
         }
         [Command("getitemids", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
