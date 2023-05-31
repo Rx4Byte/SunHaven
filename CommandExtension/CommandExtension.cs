@@ -20,7 +20,7 @@ namespace CommandExtension
         public const string PLUGIN_GUID = "com.Rx4Byte.CommandExtension";
         public const string PLUGIN_VERSION = "1.1.97";
     }
-
+    [CommandPrefix("!")]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public partial class CommandExtension : BaseUnityPlugin
     {
@@ -79,6 +79,7 @@ namespace CommandExtension
         public const string CmdSetSeason = CmdPrefix + "season";
         public const string CmdFixYear = CmdPrefix + "yearfix";
         public const string CmdIncDecYear = CmdPrefix + "years";
+        public const string CmdDisableCheats = CmdPrefix + "cheatsoff";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -137,7 +138,8 @@ namespace CommandExtension
             new Command(CmdMarryNpc,                "marry an NPC '!marry [name/all]'",                                         CommandState.None),
             new Command(CmdSetSeason,               "change season",                                                            CommandState.None),
             new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Deactivated),
-            new Command(CmdIncDecYear,              "add or sub years '!years [value]' '-' to sub",                             CommandState.None)
+            new Command(CmdIncDecYear,              "add or sub years '!years [value]' '-' to sub",                             CommandState.None),
+            new Command(CmdDisableCheats,           "Disable Cheats and hotkeys like F7,F8",                                    CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -155,6 +157,7 @@ namespace CommandExtension
                 "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = Commands[Array.FindIndex(Commands, command => command.Name == CmdJumper)].State == CommandState.Activated;
+        private static bool cheatsOff = Commands[Array.FindIndex(Commands, command => command.Name == CmdDisableCheats)].State == CommandState.Activated;
         private static bool noclip = Commands[Array.FindIndex(Commands, command => command.Name == CmdNoClip)].State == CommandState.Activated;
         private static bool printOnHover = Commands[Array.FindIndex(Commands, command => command.Name == CmdPrintHoverItem)].State == CommandState.Activated;
         private static bool infMana = Commands[Array.FindIndex(Commands, command => command.Name == CmdManaInf)].State == CommandState.Activated;
@@ -181,9 +184,18 @@ namespace CommandExtension
             Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
             Array.Sort(Commands, (x, y) => x.Name.CompareTo(y.Name));
         }
-        private void Update()
+        private void Update()//cheatsOff
         {
-
+            if (QuantumConsole.Instance)
+            {
+                if (!cheatsOff && !Settings.EnableCheats)
+                {
+                    QuantumConsole.Instance.GenerateCommands = Settings.EnableCheats = true;
+                    QuantumConsole.Instance.Initialize();
+                }
+                else if (cheatsOff && Settings.EnableCheats)
+                    QuantumConsole.Instance.GenerateCommands = Settings.EnableCheats = false;
+            }
         }
         private void OnGUI()
         {
@@ -274,6 +286,9 @@ namespace CommandExtension
 
                 case CmdJumper:
                     return CommandFunction_Jumper();
+
+                case CmdDisableCheats:
+                    return CommandFunction_ToggleCheats();
 
                 case CmdSleep:
                     return CommandFunction_Sleep();
@@ -1382,6 +1397,192 @@ namespace CommandExtension
             typeof(DayCycle).GetMethod("SetInitialTime", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(DayCycle.Instance, null);
             CommandFunction_PrintToChat($"It's now Year {(Date.Time.Year / 4).ToString().ColorText(Green)}!".ColorText(Yellow));
             return true;
+        }
+        // TOGGLE CHEATS
+        private static bool CommandFunction_ToggleCheats()
+        {
+            int i = Array.FindIndex(Commands, command => command.Name == CmdDisableCheats);
+            Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
+            bool flag = Commands[i].State == CommandState.Activated;
+            cheatsOff = flag;
+            CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
+            return true;
+        }
+        #endregion
+
+        // duplicated "command methodes" (no functions) to use the in-game COMMAND feature
+        #region fake methode to show commands while typing
+        [Command("help", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm0(string showAllCommandsWithCurrentState)
+        {
+        }
+        [Command("state", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm1(string showActivatedCommands)
+        {
+        }
+        [Command("getitemids", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm2(string xp_money_bonus_furniture_quest_all)
+        {
+        }
+        [Command("minereset", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm3()
+        {
+        }
+        [Command("mineclear", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm4()
+        {
+        }
+        [Command("mineoverfill", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm5()
+        {
+        }
+        [Command("coins", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm6(string amountToAddOrSub)
+        {
+        }
+        [Command("orbs", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm7(string amountToAddOrSub)
+        {
+        }
+        [Command("tickets", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm8(string amountToAddOrSub)
+        {
+        }
+        [Command("name", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm9(string playerNameForCommand)
+        {
+        }
+        [Command("time", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        public static void fm10(string DayOrHoure_and_Value)
+        {
+        }
+        [Command("weather", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        public static void fm11(string raining_heatwave_clear)
+        {
+        }
+        [Command("give", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm12(string itemName)
+        {
+        }
+        [Command("items", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm13(string itemName_ToShowItemsWithGivenName)
+        {
+        }
+        [Command("devkit", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm14(string GetDevItems)
+        {
+        }
+        [Command("dasher", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm15(string infiniteAirJumps)
+        {
+        }
+        [Command("showid", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm16(string ShowsItemIdsInDescription)
+        {
+        }
+        [Command("manafill", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm17(string refillMana)
+        {
+        }
+        [Command("manainf", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm18(string infiniteMana)
+        {
+        }
+        [Command("healthfill", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm19(string refillHealth)
+        {
+        }
+        [Command("sleep", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm20(string sleepOnce)
+        {
+        }
+        [Command("printhoveritem", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm21(string sendItemIdAndNameToChat)
+        {
+        }
+        [Command("feedback", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm22(string toggleCommandFeedback)
+        {
+        }
+        [Command("pause", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm23(string pauseTime)
+        {
+        }
+        [Command("timespeed", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm24(string toggleOrSetCustomTimeSpeed)
+        {
+        }
+        [Command("ui", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm25(string OnOrOff_ToToggleHUD)
+        {
+        }
+        [Command("jumper", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm26(string toggleToJumpOverObjects)
+        {
+        }
+        [Command("noclip", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm27(string toggleForNoclip)
+        {
+        }
+        [Command("nohit", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm28(string toggleForGodMode)
+        {
+        }
+        [Command("autofillmuseum", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm29(string autofillMusuemOnEnterMuseum)
+        {
+        }
+        [Command("cheatfillmuseum", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm30(string cheatfillMusuemOnEnterMuseum)
+        {
+        }
+        [Command("tp", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm31(string teleportLocation)
+        {
+        }
+        [Command("tps", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm32(string showTeleportLocations)
+        {
+        }
+        [Command("despawnpet", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm33(string despawnPet)
+        {
+        }
+        [Command("pet", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm34(string petNameToSpawn)
+        {
+        }
+        [Command("pets", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm35(string showPetNames)
+        {
+        }
+        [Command("divorce", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm36(string NPCNameToUnmarry)
+        {
+        }
+        [Command("relationship", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm37(string NPCName_and_value_ToChangeRelationship)
+        {
+        }
+        [Command("marry", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm38(string NPCNameToMarry)
+        {
+        }
+        [Command("season", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm39(string seasonToSet)
+        {
+        }
+        [Command("yearfix", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm40(string toggleToShowTheCorrectYear)
+        {
+        }
+        [Command("years", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm41(string yearsToAddOrSub)
+        {
+        }
+        [Command("cheatsoff", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
+        private static void fm42(string toggleCheats_DefaultOn)
+        {
         }
         #endregion
         #endregion
