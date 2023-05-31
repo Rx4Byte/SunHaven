@@ -1571,7 +1571,7 @@ namespace CommandExtension
         {
         }
         [Command("cheats", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm42(string INFO_toggleCheats_DefaultOn)
+        private static void fm42(string INFO_toggleGameCheats)
         {
         }
         #endregion
