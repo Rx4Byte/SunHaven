@@ -79,7 +79,7 @@ namespace CommandExtension
         public const string CmdSetSeason = CmdPrefix + "season";
         public const string CmdFixYear = CmdPrefix + "yearfix";
         public const string CmdIncDecYear = CmdPrefix + "years";
-        public const string CmdDisableCheats = CmdPrefix + "cheatsoff";
+        public const string Cheats = CmdPrefix + "cheatsoff";
         public enum CommandState { None, Activated, Deactivated }
         // COMMAND CLASS
         public class Command
@@ -139,7 +139,7 @@ namespace CommandExtension
             new Command(CmdSetSeason,               "change season",                                                            CommandState.None),
             new Command(CmdFixYear,                 "fix year (if needed)",                                                     CommandState.Deactivated),
             new Command(CmdIncDecYear,              "add or sub years '!years [value]' '-' to sub",                             CommandState.None),
-            new Command(CmdDisableCheats,           "Disable Cheats and hotkeys like F7,F8",                                    CommandState.Deactivated)
+            new Command(Cheats,           "Disable Cheats and hotkeys like F7,F8",                                    CommandState.Deactivated)
         };
         #endregion
         // ITEM ID's
@@ -157,7 +157,7 @@ namespace CommandExtension
                 "withergatefarm", "castle", "withergatehome", "grandtree", "taxi", "dynus", "sewer", "nivara", "barracks", "elios", "dungeon", "store", "beach" };
         // COMMAND STATE VAR'S FOR FASTER ACCESS (inside patches)
         private static bool jumpOver = Commands[Array.FindIndex(Commands, command => command.Name == CmdJumper)].State == CommandState.Activated;
-        private static bool cheatsOff = Commands[Array.FindIndex(Commands, command => command.Name == CmdDisableCheats)].State == CommandState.Activated;
+        private static bool cheatsOff = Commands[Array.FindIndex(Commands, command => command.Name == Cheats)].State == CommandState.Activated;
         private static bool noclip = Commands[Array.FindIndex(Commands, command => command.Name == CmdNoClip)].State == CommandState.Activated;
         private static bool printOnHover = Commands[Array.FindIndex(Commands, command => command.Name == CmdPrintHoverItem)].State == CommandState.Activated;
         private static bool infMana = Commands[Array.FindIndex(Commands, command => command.Name == CmdManaInf)].State == CommandState.Activated;
@@ -166,6 +166,7 @@ namespace CommandExtension
         private static bool yearFix = Commands[Array.FindIndex(Commands, command => command.Name == CmdFixYear)].State == CommandState.Activated;
         // ...
         private static float timeMultiplier = CommandParamDefaults.timeMultiplier;
+        private static bool commandsGenerated = false;
         private static string playerNameForCommandsFirst;
         private static string playerNameForCommands;
         private static string lastPetName = "";
@@ -186,16 +187,8 @@ namespace CommandExtension
         }
         private void Update()
         {
-            if (QuantumConsole.Instance)
-            {
-                if (!cheatsOff && !Settings.EnableCheats)
-                {
-                    QuantumConsole.Instance.GenerateCommands = Settings.EnableCheats = true;
-                    QuantumConsole.Instance.Initialize();
-                }
-                else if (cheatsOff && Settings.EnableCheats)
-                    QuantumConsole.Instance.GenerateCommands = Settings.EnableCheats = false;
-            }
+            if (QuantumConsole.Instance && !commandsGenerated)
+                GenerateCommands();
         }
         private void OnGUI()
         {
@@ -287,7 +280,7 @@ namespace CommandExtension
                 case CmdJumper:
                     return CommandFunction_Jumper();
 
-                case CmdDisableCheats:
+                case Cheats:
                     return CommandFunction_ToggleCheats();
 
                 case CmdSleep:
@@ -410,6 +403,14 @@ namespace CommandExtension
             return true;
         }
         #endregion
+
+        // Generate Commands
+        private static void GenerateCommands()
+        {
+            QuantumConsole.Instance.GenerateCommands = true;
+            QuantumConsole.Instance.Initialize();
+            commandsGenerated = true;
+        }
 
         // command methodes
         #region CommandFunction - Methode's
@@ -1401,10 +1402,10 @@ namespace CommandExtension
         // TOGGLE CHEATS
         private static bool CommandFunction_ToggleCheats()
         {
-            int i = Array.FindIndex(Commands, command => command.Name == CmdDisableCheats);
+            int i = Array.FindIndex(Commands, command => command.Name == Cheats);
             Commands[i].State = Commands[i].State == CommandState.Activated ? CommandState.Deactivated : CommandState.Activated;
             bool flag = Commands[i].State == CommandState.Activated;
-            cheatsOff = flag;
+            Settings.EnableCheats = flag;
             CommandFunction_PrintToChat($"{Commands[i].Name} {Commands[i].State.ToString().ColorText(flag ? Green : Red)}".ColorText(Yellow));
             return true;
         }
@@ -1581,7 +1582,7 @@ namespace CommandExtension
         {
         }
         [Command("cheatsoff", QFSW.QC.Platform.AllPlatforms, MonoTargetType.Single)]
-        private static void fm42(string toggleCheats_DefaultOn)
+        private static void fm42(string toggleCheats)
         {
         }
         #endregion
