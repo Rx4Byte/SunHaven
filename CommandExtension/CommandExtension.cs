@@ -166,8 +166,6 @@ namespace CommandExtension
         private static bool yearFix = Commands[Array.FindIndex(Commands, command => command.Name == CmdFixYear)].State == CommandState.Activated;
         // ...
         private static float timeMultiplier = CommandParamDefaults.timeMultiplier;
-        private static bool commandsGenerated = false;
-        private static bool receivedWelcomeMessage = false;
         private static string playerNameForCommandsFirst;
         private static string playerNameForCommands;
         private static string lastPetName = "";
@@ -1727,30 +1725,6 @@ namespace CommandExtension
         {
             static void Postfix(Player __instance)
             {
-                //if (ranOnceOnPlayerSpawn < 2)
-                //    ranOnceOnPlayerSpawn++;
-                //else if (ranOnceOnPlayerSpawn == 2)
-                //    if (Commands[Array.FindIndex(Commands, command => command.Name == CmdFeedbackDisabled)].State == CommandState.Deactivated)
-                //    {
-                //        CommandFunction_PrintToChat("> Command Extension Active! type '!help' for command list".ColorText(Color.magenta) + "\n -----------------------------------------------------------------".ColorText(Color.black));
-                //        // Enable in-game command feature 
-                //        if (Player.Instance != null && QuantumConsole.Instance && !commandsGenerated)
-                //        {
-                //            QuantumConsole.Instance.GenerateCommands = Settings.EnableCheats = true;
-                //            QuantumConsole.Instance.Initialize();
-                //            Settings.EnableCheats = false;
-                //            commandsGenerated = true;
-                //        }
-                //        ranOnceOnPlayerSpawn++;
-                //        if (debug)
-                //        {
-                //            CommandFunction_PrintToChat("debug: enable cheat commands".ColorText(Color.magenta));
-                //            CommandFunction_Jumper();
-                //            CommandFunction_InfiniteMana();
-                //            CommandFunction_InfiniteAirSkips();
-                //            CommandFunction_Pause();
-                //        }
-                //    }
                 if (Commands[Array.FindIndex(Commands, command => command.Name == CmdFeedbackDisabled)].State == CommandState.Deactivated)
                 {
                     // show welcome message
