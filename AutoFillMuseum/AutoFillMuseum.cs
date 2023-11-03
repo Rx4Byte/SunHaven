@@ -8,22 +8,26 @@ using Wish;
 
 namespace AutoFillMuseum
 {
+    public static class PluginInfo
+    {
+        // public const string PLUGIN_AUTHOR = "Rx4Byte";
+        public const string PLUGIN_NAME = "Automatic Museums Filler";
+        public const string PLUGIN_GUID = "com.Rx4Byte.AutomaticMuseumsFiller";
+        public const string PLUGIN_VERSION = "1.1";
+    }
+
     [Harmony]
-    [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class AutoFillMuseum : BaseUnityPlugin
     {
-        private const string PluginName = "Automatic Museums Filler";
-        private const string PluginGuid = "com.Rx4Byte.AutomaticMuseumsFiller";
-        private const string PluginVersion = "1.1";
-
         private static ConfigEntry<bool> ModEnabled { get; set; }
         private static ConfigEntry<bool> ShowNotifications { get; set; }
-    
+
         private void Awake()
-        { 
-            ModEnabled = Config.Bind("General", "Enabled", true, $"Enable {PluginName}");
+        {
+            ModEnabled = Config.Bind("General", "Enabled", true, $"Enable {PluginInfo.PLUGIN_NAME}");
             ShowNotifications = Config.Bind("General", "Show Notifications", true, "Show notifications when items are added to the museum");
-            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginGuid);
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginInfo.PLUGIN_GUID);
         }
 
         [HarmonyPostfix]
@@ -53,7 +57,7 @@ namespace AutoFillMuseum
                     }
                 }
             }
-        
+
             foreach (var vPodium in FindObjectsOfType<MuseumBundleVisual>())
             {
                 vPodium.OnSaveInventory();
