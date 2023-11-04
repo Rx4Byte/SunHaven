@@ -1,70 +1,66 @@
-﻿using BepInEx;
+using BepInEx;
 using HarmonyLib;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Security.Policy;
-using System.Text.RegularExpressions;
-using UnityEngine;
+using BepInEx.Configuration;
 using Wish;
 
 namespace AutoFillMuseum
 {
-    public class PluginInfo
+    public static class PluginInfo
     {
-        public const string PLUGIN_AUTHOR = "Rx4Byte";
+        // public const string PLUGIN_AUTHOR = "Rx4Byte";
         public const string PLUGIN_NAME = "Automatic Museums Filler";
         public const string PLUGIN_GUID = "com.Rx4Byte.AutomaticMuseumsFiller";
-        public const string PLUGIN_VERSION = "1.0";
+        public const string PLUGIN_VERSION = "1.1";
     }
 
+    [Harmony]
     [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-    public partial class AutoFillMuseum : BaseUnityPlugin
+    public class AutoFillMuseum : BaseUnityPlugin
     {
-        private void Awake() => Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), null);
+        private static ConfigEntry<bool> ModEnabled { get; set; }
+        private static ConfigEntry<bool> ShowNotifications { get; set; }
 
-        // get player
-        public static Player GetPlayerForCommand() { return Player.Instance; }
-
-        // auto fill museum
-        [HarmonyPatch(typeof(HungryMonster))]
-        [HarmonyPatch("SetMeta")]
-        class Patch_HungryMonsterSetMeta
+        private void Awake()
         {
-            static void Postfix(HungryMonster __instance, DecorationPositionData decorationData)
+            ModEnabled = Config.Bind("General", "Enabled", true, $"Enable {PluginInfo.PLUGIN_NAME}");
+            ShowNotifications = Config.Bind("General", "Show Notifications", true, "Show notifications when items are added to the museum");
+            Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly(), PluginInfo.PLUGIN_GUID);
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HungryMonster), nameof(HungryMonster.SetMeta))]
+        private static void HungryMonster_SetMeta(HungryMonster __instance)
+        {
+            if (!ModEnabled.Value) return;
+            if (__instance.bundleType != BundleType.MuseumBundle || Player.Instance == null || Player.Instance.Inventory == null) return;
+
+            var playerInventory = Player.Instance.Inventory;
+
+            if (__instance.sellingInventory == null) return;
+
+            foreach (var slotItemData in __instance.sellingInventory.Items.Where(slotItemData => slotItemData.item != null && slotItemData.slot.numberOfItemToAccept != 0 && slotItemData.amount < slotItemData.slot.numberOfItemToAccept))
             {
-                if (__instance.bundleType == BundleType.MuseumBundle)
+                foreach (var pItem in playerInventory.Items)
                 {
-                    Player player = GetPlayerForCommand();
-                    if (player == null)
-                        return;
-                    HungryMonster monster = __instance;
-                    if (monster.sellingInventory != null) // && monster.sellingInventory.Items != null && monster.sellingInventory.Items.Count >= 1
+                    if (pItem.id != slotItemData.slot.itemToAccept.id) continue;
+                    var amountToTransfer = Math.Min(pItem.amount, slotItemData.slot.numberOfItemToAccept - slotItemData.amount);
+                    var itemData = ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id);
+                    __instance.sellingInventory.AddItem(itemData.GetItem(), amountToTransfer, slotItemData.slotNumber, false);
+                    playerInventory.RemoveItem(pItem.item, amountToTransfer);
+                    __instance.UpdateFullness();
+                    if (ShowNotifications.Value)
                     {
-                        foreach (SlotItemData slotItemData in monster.sellingInventory.Items)
-                        {
-                            if (!monster.name.ToLower().Contains("money") && slotItemData.item != null && player.Inventory != null)
-                            {
-                                if (slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
-                                    continue;
-                                Inventory pInventory = player.Inventory;
-                                foreach (var pItem in pInventory.Items)
-                                {
-                                    if (pItem.id == slotItemData.slot.itemToAccept.id)
-                                    {
-                                        int amount = Math.Min(pItem.amount, slotItemData.slot.numberOfItemToAccept - slotItemData.amount);
-                                        monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), amount, slotItemData.slotNumber, false);
-                                        //CommandFunction_PrintToChat($"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}");
-                                        player.Inventory.RemoveItem(pItem.item, amount);
-                                        monster.UpdateFullness();
-                                    }
-                                }
-                            }
-                        }
-                        Array.ForEach(FindObjectsOfType<MuseumBundleVisual>(), vPodium => typeof(MuseumBundleVisual).GetMethod("OnSaveInventory", BindingFlags.NonPublic | BindingFlags.Instance).Invoke(vPodium, null));
+                        SingletonBehaviour<NotificationStack>.Instance.SendNotification($"Added {itemData.name} to the museum!", itemData.id, amountToTransfer);
                     }
                 }
+            }
+
+            foreach (var vPodium in FindObjectsOfType<MuseumBundleVisual>())
+            {
+                vPodium.OnSaveInventory();
             }
         }
     }
