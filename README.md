@@ -4,12 +4,18 @@ This repository contains mods for the game Sunhaven.
 
 ## Containing Mods
 * **CommandExtension**: This mod adds a variety of new console commands.
-* **AutoFillMuseum**: This mod automatically adds inventory items to the museum upon entry.
+* **SmartMuseum**: This mod that adds a Quality of Life feature to the game by automatically filling the museum upon entry.
 * **ControllerBypass**: This mod disables direct controller inputs to be able to use any remapper for controller.
 * **YearCorrection [OBSOLETE]**: This mod corrects the year calculation, no permanent changes.
 * **Testing [DEV]**: This mod is just a testing environment.
 
 ## Command Extension
+This mod enhances the existing command system of the game by introducing a new set of commands.
+These commands are prefixed with '!' and are used to activate various cheats within the game.  
+* **To use the commands from this mod, simply prefix the command with '!'.**  
+* **Please note that the commands from the game itself still use the ‘/’ prefixes.**
+
+> to activate the pause cheat, you would enter `!pause` in the game's command console.
 
 ### COMMANDS:
 * General Commands
@@ -55,7 +61,6 @@ This repository contains mods for the game Sunhaven.
   * `!ui`: Toggle UI, hide or show the UI back.
   * `!tp [location]`: Teleport to a location. For example, `!tp home`.
   * `!tps`: Prints all teleport locations.
-  * `!exp [ExpType] [Amount]`: Add experience. Use `!exp farming 100`.
 
 * Misc Commands
   * `!devkit`: Get all developer items.
@@ -70,3 +75,12 @@ This repository contains mods for the game Sunhaven.
   * `!relationship [NPCName] [value]`
   * `!divorce [NPCName]`
   * `!marry [NPCName]`
+  * `!exp [ExpType] [Amount]`: Add experience. Use `!exp farming 100`.
+
+
+## SmartMuseum: A Standalone Museum-AutoFill Mod
+This standalone mod adds a Quality of Life feature to the game by automatically filling the museum upon entry. The QoL addition eliminates the need for manual placement of items in the museum.  
+Simply **walk into the museum with the necessary items in your inventory**, and watch as it fills up!
+
+## ControllerBypass
+This mod disables direct controller inputs, allowing you to use any remapper for your controller. It provides you with the freedom to customize your controller settings as per your preferences. With this, you're no longer limited by the game's default controller settings.
