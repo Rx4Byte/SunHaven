@@ -13,7 +13,7 @@ This repository contains mods for the game Sunhaven.
 This mod enhances the existing command system of the game by introducing a new set of commands.
 These commands are prefixed with '!' and are used to activate various cheats within the game.  
 * **To use the commands from this mod, simply prefix the command with '!'.**  
-* **Please note that the commands from the game itself still use the ‘/’ prefixes.**
+* **Please note that the commands from the game itself still uses the ‘/’ prefix.**
 
 > to activate the pause cheat, you would enter `!pause` in the game's command console.
 
