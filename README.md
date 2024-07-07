@@ -65,10 +65,10 @@ These commands are prefixed with '!' and are used to activate various cheats wit
 * Misc Commands
   * `!devkit`: Get all developer items.
   * `!cheats`: Toggle cheat-keybinds.
-  * `!autofillmuseum`: Toggle, automatically fill museum upon entry (need items in inventory).
-  * `!cheatfillmuseum`: Toggle, automatically fill museum upon entry (no items needed, CHEATING).
 
 * Commands Needing Update
+  * `!autofillmuseum`: Toggle, automatically fill museum upon entry (need items in inventory).
+  * `!cheatfillmuseum`: Toggle, automatically fill museum upon entry (no items needed, CHEATING).
   * `!despawnpet`
   * `!pet [petname]`
   * `!pets`
