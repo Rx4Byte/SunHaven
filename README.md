@@ -10,12 +10,14 @@ This repository contains mods for the game Sunhaven.
 * **Testing [DEV]**: This mod is just a testing environment.
 
 ## Command Extension
-This mod enhances the existing command system of the game by introducing a new set of commands.
-These commands are prefixed with '!' and are used to activate various cheats within the game.  
-* **To use the commands from this mod, simply prefix the command with '!'.**  
-* **Please note that the commands from the game itself still uses the ‘/’ prefix.**
+This mod is designed to enhance your gaming experience by allowing you to enter commands directly into the game’s chat box. It operates alongside the game’s existing command system, but with its own unique command prefix.  
 
-> to activate the pause cheat, you would enter `!pause` in the game's command console.
+**Here’s how to use it:**
+
+* **Open the game’s chat box:**
+This is typically done by pressing a specific key or button in the game. The chat box is where you’ll be entering your commands.
+* **Enter your command:** Commands for the game itself start with a `/` prefix, while commands for the mod use a `!` prefix. For example, if you want to use a command from the mod, you would type something like `!pause`.
+* **Execute the command:** After typing your command into the chat box, simply press enter. If the text you entered is a recognized command, it will be executed. If it’s not a recognized command, it will be sent as a regular chat message.
 
 ### COMMANDS:
 * General Commands
