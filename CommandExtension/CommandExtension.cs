@@ -408,6 +408,14 @@ namespace CommandExtension
             if (Commands.First(command => command.Name == CmdFeedbackDisabled).State == CommandState.Deactivated)
                 QuantumConsole.Instance.LogPlayerText(text);
         }
+
+        public static string FirstCharToUpper(string input)
+        {
+            if (String.IsNullOrEmpty(input))
+                throw new ArgumentException("ARGH!");
+            return input.First().ToString().ToUpper() + input.Substring(1);
+        }
+
         // HELP *
         private static bool CommandFunction_Help(bool status = false)
         {
@@ -1227,12 +1235,17 @@ namespace CommandExtension
         {
             if (mayCmdParam.Length >= 2)
             {
-                string name = mayCmdParam[1];
+                string name = FirstCharToUpper(mayCmdParam[1]);
                 bool all = mayCmdParam[1] == "all";
                 NPCAI[] npcs = FindObjectsOfType<NPCAI>();
                 foreach (NPCAI npcai in npcs)
                 {
-                    if (all || npcai.NPCName.ToLower() == name)
+                    string npcName = _GetNpcName(npcai);
+                    if (npcName == null)
+                    {
+                        break;
+                    }
+                    if (all || npcName == name)
                     {
                         npcai.MarryPlayer();
                         string progressStringCharacter = SingletonBehaviour<GameSave>.Instance.GetProgressStringCharacter("MarriedWith");
@@ -1246,7 +1259,7 @@ namespace CommandExtension
                         }
                         if (!all)
                         {
-                            CommandFunction_PrintToChat($"You divorced {npcai.NPCName.ColorText(Color.white)}!".ColorText(Green));
+                            CommandFunction_PrintToChat($"You divorced {npcName.ColorText(Color.white)}!".ColorText(Green));
                             return true;
                         }
                     }
@@ -1304,25 +1317,42 @@ namespace CommandExtension
             }
             return true;
         }
+        private static Regex npcNameRegex = new Regex(@"[a-zA-Z]+");
+        private static String _GetNpcName(NPCAI npcai)
+        {
+            var matches = npcNameRegex.Matches(npcai.NPCName);
+            foreach (Match match in matches)
+            {
+                return (String)match.Value;
+            }
+            return null;
+        }
+
         // MARRY NPC
         private static bool CommandFunction_MarryNPC(string[] mayCmdParam)
         {
             if (mayCmdParam.Length >= 2)
             {
-                string name = mayCmdParam[1];
+                string name = FirstCharToUpper(mayCmdParam[1]);
                 bool all = mayCmdParam[1] == "all";
                 NPCAI[] npcs = FindObjectsOfType<NPCAI>();
                 foreach (NPCAI npcai in npcs)
                 {
-                    if (all || npcai.NPCName.ToLower() == name)
+                    string npcName = _GetNpcName(npcai);
+                    if (npcName == null)
                     {
-
-                        if (SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName] < 100f)
-                            SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcai.NPCName] = 100f;
+                        break;
+                    }
+                    if (all || npcName == name)
+                    {
+                        if (SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcName] < 100f)
+                        {
+                            SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcName] = 100f;
+                        }
                         npcai.MarryPlayer();
                         if (!all)
                         {
-                            CommandFunction_PrintToChat($"You married {npcai.NPCName.ColorText(Color.white)}!".ColorText(Green));
+                            CommandFunction_PrintToChat($"You married {npcName.ColorText(Color.white)}!".ColorText(Green));
                             return true;
                         }
                     }
