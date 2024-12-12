@@ -1241,7 +1241,7 @@ namespace CommandExtension
                 foreach (NPCAI npcai in npcs)
                 {
                     string npcName = _GetNpcName(npcai);
-                    if (npcName == null)
+                    if (npcName == null || !SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships.ContainsKey(npcName))
                     {
                         continue;
                     }
@@ -1339,7 +1339,7 @@ namespace CommandExtension
                 foreach (NPCAI npcai in npcs)
                 {
                     string npcName = _GetNpcName(npcai);
-                    if (npcName == null)
+                    if (npcName == null || !SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships.ContainsKey(npcName))
                     {
                         continue;
                     }
