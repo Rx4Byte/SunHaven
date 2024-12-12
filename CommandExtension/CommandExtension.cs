@@ -1243,7 +1243,7 @@ namespace CommandExtension
                     string npcName = _GetNpcName(npcai);
                     if (npcName == null)
                     {
-                        break;
+                        continue;
                     }
                     if (all || npcName == name)
                     {
@@ -1341,7 +1341,7 @@ namespace CommandExtension
                     string npcName = _GetNpcName(npcai);
                     if (npcName == null)
                     {
-                        break;
+                        continue;
                     }
                     if (all || npcName == name)
                     {
