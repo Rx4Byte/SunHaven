@@ -1317,7 +1317,7 @@ namespace CommandExtension
             }
             return true;
         }
-        private static Regex npcNameRegex = new Regex(@"[a-zA-Z]+");
+        private static Regex npcNameRegex = new Regex(@"[a-zA-Z\s\.]+");
         private static String _GetNpcName(NPCAI npcai)
         {
             var matches = npcNameRegex.Matches(npcai.NPCName);
