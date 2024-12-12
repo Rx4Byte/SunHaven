@@ -10,6 +10,8 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using System.IO;
 using Wish;
+using System.Runtime.Remoting.Messaging;
+
 
 namespace CommandExtension
 {
@@ -94,6 +96,7 @@ namespace CommandExtension
                 State = state;
             }
         }
+
         // COMMAND CREATION
         public static Command[] Commands = new Command[]
         {
@@ -143,7 +146,8 @@ namespace CommandExtension
         };
         #endregion
         // ITEM ID's
-        private static Dictionary<string, int> allIds = ItemDatabase.ids;
+
+        private static Dictionary<string, int> allIds = ItemDatabaseWrapper.ItemDatabase.ids;
         private static Dictionary<string, int> moneyIds = new Dictionary<string, int>() { { "coins", 60000 }, { "orbs", 18010 }, { "tickets", 18011 } };
         private static Dictionary<string, int> xpIds = new Dictionary<string, int>() { { "combatexp", 60003 }, { "farmingexp", 60004 }, { "miningexp", 60006 }, { "explorationexp", 60005 }, { "fishingexp", 60008 } };
         private static Dictionary<string, int> bonusIds = new Dictionary<string, int>() { { "health", 60009 }, { "mana", 60007 } };
@@ -374,28 +378,28 @@ namespace CommandExtension
         #endregion
 
         // Categorize all items
-        #region Categorize 'ItemDatabase.ids' into 'categorizedItems'
+        #region Categorize 'ItemDatabaseWrapper.ItemDatabase.ids' into 'categorizedItems'
         private static bool CategorizeItemList()
         {
-            if (ItemDatabase.ids == null || ItemDatabase.ids.Count < 1)
-                return false;
-            foreach (var item in allIds)
-            {
-                if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Furniture)
-                    categorizedItems["Furniture Items"].Add(item.Key, item.Value);
-                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Equip)
-                    categorizedItems["Equipable Items"].Add(item.Key, item.Value);
-                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Quest)
-                    categorizedItems["Quest Items"].Add(item.Key, item.Value);
-                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Craftable)
-                    categorizedItems["Craftable Items"].Add(item.Key, item.Value);
-                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Monster)
-                    categorizedItems["Monster Items"].Add(item.Key, item.Value);
-                else if (ItemDatabase.GetItemData(item.Value).category == ItemCategory.Use)
-                    categorizedItems["Useable Items"].Add(item.Key, item.Value);
-                else
-                    categorizedItems["Other Items"].Add(item.Key, item.Value);
-            }
+            if (ItemDatabaseWrapper.ItemDatabase.ids == null || ItemDatabaseWrapper.ItemDatabase.ids.Count < 1)
+                   return false;
+               foreach (var item in allIds)
+               {
+                   if (ItemDatabaseWrapper.ItemDatabase.GetItemData(item.Value).category == ItemCategory.Furniture)
+                       categorizedItems["Furniture Items"].Add(item.Key, item.Value);
+                   else if (ItemDatabaseWrapper.ItemDatabase.GetItemData(item.Value).category == ItemCategory.Equip)
+                       categorizedItems["Equipable Items"].Add(item.Key, item.Value);
+                   else if (ItemDatabaseWrapper.ItemDatabase.GetItemData(item.Value).category == ItemCategory.Quest)
+                       categorizedItems["Quest Items"].Add(item.Key, item.Value);
+                   else if (ItemDatabaseWrapper.ItemDatabase.GetItemData(item.Value).category == ItemCategory.Craftable)
+                       categorizedItems["Craftable Items"].Add(item.Key, item.Value);
+                   else if (ItemDatabaseWrapper.ItemDatabase.GetItemData(item.Value).category == ItemCategory.Monster)
+                       categorizedItems["Monster Items"].Add(item.Key, item.Value);
+                   else if (ItemDatabaseWrapper.ItemDatabase.GetItemData(item.Value).category == ItemCategory.Use)
+                       categorizedItems["Useable Items"].Add(item.Key, item.Value);
+                   else
+                       categorizedItems["Other Items"].Add(item.Key, item.Value);
+               }
             return true;
         }
         #endregion
@@ -491,7 +495,7 @@ namespace CommandExtension
                         CommandFunction_PrintToChat(file.ColorText(Color.white));
                     }
                     else
-                        CommandFunction_PrintToChat("ERROR: ".ColorText(Red) + "ItemDatabase.ids".ColorText(Color.white) + " is empty!".ColorText(Red));
+                        CommandFunction_PrintToChat("ERROR: ".ColorText(Red) + "ItemDatabaseWrapper.ItemDatabase.ids".ColorText(Color.white) + " is empty!".ColorText(Red));
                     break;
                 case 'b':
                     CommandFunction_PrintToChat("[BONUS-ITEM-IDs]".ColorText(Color.black));
@@ -501,13 +505,13 @@ namespace CommandExtension
                 case 'f':
                     CommandFunction_PrintToChat("[FURNITURE-ITEM-IDs]".ColorText(Color.black));
                     foreach (KeyValuePair<string, int> id in allIds)
-                        if (ItemDatabase.GetItemData(id.Value).category == ItemCategory.Furniture)
+                        if (ItemDatabaseWrapper.ItemDatabase.GetItemData(id.Value).category == ItemCategory.Furniture)
                             CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
                     break;
                 case 'q':
                     CommandFunction_PrintToChat("[QUEST-ITEM-IDs]".ColorText(Color.black));
                     foreach (KeyValuePair<string, int> id in allIds)
-                        if (ItemDatabase.GetItemData(id.Value).category == ItemCategory.Quest)
+                        if (ItemDatabaseWrapper.ItemDatabase.GetItemData(id.Value).category == ItemCategory.Quest)
                             CommandFunction_PrintToChat($"{id.Key} : {id.Value}");
                     break;
                 default:
@@ -700,7 +704,7 @@ namespace CommandExtension
                     {
                         int itemAmount = (mayCommandParam.Length >= 3 && int.TryParse(mayCommandParam[2], out itemAmount)) ? itemAmount : 1;
                         GetPlayerForCommand().Inventory.AddItem(itemId, itemAmount, 0, true, true);
-                        CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} got {itemAmount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(itemId).name.ColorText(Color.white)}!".ColorText(Yellow));
+                        CommandFunction_PrintToChat($"{playerNameForCommands.ColorText(Color.magenta)} got {itemAmount.ToString().ColorText(Color.white)} * {ItemDatabaseWrapper.ItemDatabase.GetItemData(itemId).name.ColorText(Color.white)}!".ColorText(Yellow));
                     }
                     else
                         CommandFunction_PrintToChat($"no item with id: {itemId.ToString().ColorText(Color.white)} found!".ColorText(Red));
@@ -711,7 +715,7 @@ namespace CommandExtension
                     int lastItemId = 0;
                     if (mayCommandParam.Length >= 2)
                     {
-                        foreach (KeyValuePair<string, int> id in allIds)
+                      /*  foreach (KeyValuePair<string, int> id in allIds)
                         {
                             if (id.Key.Contains(mayCommandParam[1].ToLower()))
                             {
@@ -740,7 +744,7 @@ namespace CommandExtension
                             }
                         }
                         else
-                            CommandFunction_PrintToChat($"no item name contains {mayCommandParam[1].ColorText(Color.white)}!".ColorText(Red));
+                            CommandFunction_PrintToChat($"no item name contains {mayCommandParam[1].ColorText(Color.white)}!".ColorText(Red));*/
                     }
                     else
                         CommandFunction_PrintToChat($"invalid itemId!".ColorText(Red));
@@ -757,17 +761,17 @@ namespace CommandExtension
             if (mayCommandParam.Length >= 2)
             {
                 List<string> items = new List<string>();
-                foreach (KeyValuePair<string, int> id in allIds)
-                {
-                    if (id.Key.ToLower().Contains(mayCommandParam[1]))
-                        items.Add(id.Key.ColorText(Color.white) + " : ".ColorText(Color.black) + id.Value.ToString().ColorText(Color.white));
-                }
-                if (items.Count >= 1)
-                {
-                    CommandFunction_PrintToChat("[FOUND ITEMS]".ColorText(Color.black));
-                    foreach (string ítem in items)
-                        CommandFunction_PrintToChat(ítem);
-                }
+               // foreach (KeyValuePair<string, int> id in allIds)
+            //    {
+            //        if (id.Key.ToLower().Contains(mayCommandParam[1]))
+              //          items.Add(id.Key.ColorText(Color.white) + " : ".ColorText(Color.black) + id.Value.ToString().ColorText(Color.white));
+             //   }
+            //    if (items.Count >= 1)
+            //    {
+            //        CommandFunction_PrintToChat("[FOUND ITEMS]".ColorText(Color.black));
+                //    foreach (string ítem in items)
+                //        CommandFunction_PrintToChat(ítem);
+               // }
             }
             return true;
         }
@@ -1345,6 +1349,7 @@ namespace CommandExtension
                     }
                     if (all || npcName == name)
                     {
+                        SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships.ContainsKey(npcName);
                         if (SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcName] < 100f)
                         {
                             SingletonBehaviour<GameSave>.Instance.CurrentSave.characterData.Relationships[npcName] = 100f;
@@ -1647,7 +1652,7 @@ namespace CommandExtension
                                     if (slotItemData.item == null || slotItemData.slot.numberOfItemToAccept == 0 || slotItemData.amount == slotItemData.slot.numberOfItemToAccept)
                                         continue;
                                     if (!monster.name.ToLower().Contains("money"))
-                                        monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false);
+                                        monster.sellingInventory.AddItem(ItemDatabaseWrapper.ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), slotItemData.slot.numberOfItemToAccept - slotItemData.amount, slotItemData.slotNumber, false);
                                     else if (monster.name.ToLower().Contains("money"))
                                     {
                                         if (slotItemData.slot.itemToAccept.id >= 60000 && slotItemData.slot.itemToAccept.id <= 60002)
@@ -1676,8 +1681,8 @@ namespace CommandExtension
                                             if (pItem.id == slotItemData.slot.itemToAccept.id)
                                             {
                                                 int amount = Math.Min(pItem.amount, slotItemData.slot.numberOfItemToAccept - slotItemData.amount);
-                                                monster.sellingInventory.AddItem(ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), amount, slotItemData.slotNumber, false);
-                                                CommandFunction_PrintToChat($"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}");
+                                                monster.sellingInventory.AddItem(ItemDatabaseWrapper.ItemDatabase.GetItemData(slotItemData.slot.itemToAccept.id).GetItem(), amount, slotItemData.slotNumber, false);
+                                                CommandFunction_PrintToChat($"transferred: {amount.ToString().ColorText(Color.white)} * {ItemDatabaseWrapper.ItemDatabase.GetItemData(pItem.id).name.ColorText(Color.white)}");
                                                 player.Inventory.RemoveItem(pItem.item, amount);
                                                 monster.UpdateFullness();
                                             }
@@ -1851,9 +1856,9 @@ namespace CommandExtension
             {
                 int id = __instance.ID();
                 if (printOnHover)
-                    CommandFunction_PrintToChat($"{id} : {ItemDatabase.GetItemData(id).name}");
+                    CommandFunction_PrintToChat($"{id} : {ItemDatabaseWrapper.ItemDatabase.GetItemData(id).name}");
                 string text = "ID: ".ColorText(Color.magenta) + id.ToString().ColorText(Color.magenta) + "\"\n\"";
-                ItemData itemData = ItemDatabase.GetItemData(id);
+                ItemData itemData = ItemDatabaseWrapper.ItemDatabase.GetItemData(id);
                 if (appendItemDescWithId)
                 {
                     if (!itemData.description.Contains(text))
