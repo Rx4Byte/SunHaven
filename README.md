@@ -4,7 +4,7 @@ This repository contains mods for the game Sunhaven.
 
 ## Containing Mods
 * **CommandExtension**: This mod adds a variety of new console commands.
-* **SmartMuseum**: This mod that adds a Quality of Life feature to the game by automatically filling the museum upon entry.
+* **AutoFillMuseum**: This mod that adds a Quality of Life feature to the game by automatically filling the museum upon entry.
 * **ControllerBypass**: This mod disables direct controller inputs to be able to use any remapper for controller.
 * **YearCorrection [OBSOLETE]**: This mod corrects the year calculation, no permanent changes.
 * **Testing [DEV]**: This mod is just a testing environment.
